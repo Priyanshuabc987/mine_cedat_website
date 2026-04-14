@@ -28,7 +28,9 @@ export function EventGallery() {
       try {
         const firstResponse = await eventsAPI.listEvents({ page_size: 1000 });
         if (!firstResponse.ok) {
-          throw new Error(`Failed to fetch events: ${firstResponse.status}`);
+          // Instead of throwing and crashing, return empty structure for frontend-only mode
+          console.warn(`API returned ${firstResponse.status}. Falling back to empty data.`);
+          return { items: [], total: 0 };
         }
         const firstData = await firstResponse.json();
         
@@ -60,10 +62,10 @@ export function EventGallery() {
         return firstData;
       } catch (error) {
         console.error('Error fetching events for gallery:', error);
-        throw error;
+        return { items: [], total: 0 };
       }
     },
-    retry: 2,
+    retry: 1,
     staleTime: 30000,
   });
 
@@ -166,28 +168,28 @@ export function EventGallery() {
     );
   }
 
-  if (eventsError) {
+  if (eventsError && !allImages.length) {
     return (
       <div className="text-center py-12">
         <div className="text-muted-foreground space-y-4">
           <div className="text-6xl">⚠️</div>
           <div>
-            <h3 className="text-xl font-medium mb-2">Failed to load gallery</h3>
-            <p className="text-sm">Please try refreshing the page.</p>
+            <h3 className="text-xl font-medium mb-2">Could not connect to event gallery</h3>
+            <p className="text-sm">Please ensure the backend is running or refresh the page.</p>
           </div>
         </div>
       </div>
     );
   }
 
-  if (!events || !events.items || !Array.isArray(events.items)) {
+  if (!allImages.length && !eventsLoading) {
     return (
       <div className="text-center py-12">
         <div className="text-muted-foreground space-y-4">
           <div className="text-6xl">📷</div>
           <div>
-            <h3 className="text-xl font-medium mb-2">No events found</h3>
-            <p className="text-sm">Event photos will appear here as they are uploaded.</p>
+            <h3 className="text-xl font-medium mb-2">No event photos yet</h3>
+            <p className="text-sm">Gallery photos will appear here as they are uploaded.</p>
           </div>
         </div>
       </div>
