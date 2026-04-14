@@ -1,8 +1,9 @@
+
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, MapPin, ArrowUpRight } from 'lucide-react';
+import { Calendar, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Event } from '@/hooks/useEvents';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
@@ -50,7 +51,6 @@ export function EventCard({
       transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
     >
       <Card className="group relative bg-card rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden border border-border/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full flex flex-col min-h-0">
-        {/* Image */}
         <div className="aspect-square bg-muted relative overflow-hidden">
           {event.featured_image_url ? (
             <ImageWithFallback
@@ -64,7 +64,6 @@ export function EventCard({
             </div>
           )}
 
-          {/* Status Badge */}
           <div className="absolute top-2 sm:top-4 left-2 sm:left-4 z-20 flex flex-col gap-1.5 sm:gap-2">
             <Badge 
               variant={
@@ -80,19 +79,15 @@ export function EventCard({
                event.calculated_state === 'registration_closed' ? 'Registration Closed' :
                event.calculated_state === 'ongoing' ? 'Ongoing' :
                event.calculated_state === 'concluded' ? 'Concluded' :
-               event.calculated_state === 'draft' ? 'Draft' :
-               event.calculated_state === 'cancelled' ? 'Cancelled' :
                event.status === 'published' ? 'Live' : event.status}
             </Badge>
           </div>
 
-          {/* Date Badge */}
           <div className="absolute top-2 sm:top-4 right-2 sm:right-4 z-20 bg-background/90 backdrop-blur text-foreground px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold whitespace-nowrap">
             {dateInfo.month} {dateInfo.day}
           </div>
         </div>
 
-        {/* Content */}
         <div className="p-4 sm:p-6 flex flex-col flex-1 min-h-0">
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-[10px] sm:text-xs font-medium text-muted-foreground mb-2 sm:mb-3">
             <span className="flex items-center gap-1 min-w-0">
@@ -114,13 +109,6 @@ export function EventCard({
             {event.title}
           </h3>
 
-          {event.description && (
-            <p className="text-xs sm:text-sm text-muted-foreground line-clamp-3 mb-3 sm:mb-4 flex-1">
-              {event.description}
-            </p>
-          )}
-
-          {/* Actions */}
           <div className="flex items-center justify-end mt-auto pt-2 border-t border-border/50 gap-2">
             {showRegistrationButton ? (
               <Button
@@ -143,20 +131,7 @@ export function EventCard({
                 variant={isRegistered ? "secondary" : "default"}
                 className="text-xs sm:text-sm whitespace-nowrap min-h-[44px] px-3 sm:px-4 rounded-full"
               >
-                <span className="hidden sm:inline">
-                  {isRegistered
-                    ? 'Registered'
-                    : event.calculated_state === 'concluded' || event.calculated_state === 'cancelled'
-                    ? 'Event Completed'
-                    : 'REGISTER NOW'}
-                </span>
-                <span className="sm:hidden">
-                  {isRegistered
-                    ? 'Registered'
-                    : event.calculated_state === 'concluded' || event.calculated_state === 'cancelled'
-                    ? 'Completed'
-                    : 'Confirm'}
-                </span>
+                {isRegistered ? 'Registered' : 'REGISTER NOW'}
               </Button>
             ) : (
               <Link href={`/events/${event.id}`} className="w-full sm:w-auto">
@@ -164,11 +139,6 @@ export function EventCard({
                   size="sm"
                   className="w-full sm:w-auto rounded-full text-xs sm:text-sm font-semibold min-h-[44px]"
                   disabled={event.calculated_state === 'concluded' || event.calculated_state === 'cancelled'}
-                  variant={
-                    event.calculated_state === 'concluded' || event.calculated_state === 'cancelled'
-                      ? 'secondary'
-                      : 'default'
-                  }
                 >
                   {event.calculated_state === 'concluded' || event.calculated_state === 'cancelled'
                     ? 'Event Completed'

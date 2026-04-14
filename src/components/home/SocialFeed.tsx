@@ -1,3 +1,6 @@
+
+"use client";
+
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
@@ -14,13 +17,15 @@ export function SocialFeed() {
 
   // Load LinkedIn embed script
   useEffect(() => {
-    if (window.IN) {
-      window.IN.parse();
-    } else {
-      const script = document.createElement("script");
-      script.src = "https://platform.linkedin.com/in.js";
-      script.async = true;
-      document.body.appendChild(script);
+    if (typeof window !== 'undefined') {
+      if ((window as any).IN) {
+        (window as any).IN.parse();
+      } else {
+        const script = document.createElement("script");
+        script.src = "https://platform.linkedin.com/in.js";
+        script.async = true;
+        document.body.appendChild(script);
+      }
     }
   }, [posts]);
 
@@ -116,7 +121,7 @@ function SocialRow({
                     width="100%"
                     frameBorder="0"
                     scrolling="no"
-                    allowTransparency
+                    allowtransparency="true"
                     title="Embedded Instagram post"
                     style={{ maxWidth: "100%", backgroundColor: "#fff" }}
                   />
@@ -140,46 +145,21 @@ function SocialRow({
   );
 }
 
-// Helper function to extract LinkedIn post ID from URL
 function extractLinkedInID(url: string): string {
   try {
     const parsed = new URL(url);
     const full = `${parsed.pathname}${parsed.search}`;
-
-    // Supports LinkedIn share links like:
-    // /posts/...-ugcPost-7449394278935707648-WweS
-    // /posts/...-activity-7449394278935707648-WweS
     const ugcFromPosts = full.match(/ugcPost-(\d+)/i);
-    if (ugcFromPosts?.[1]) {
-      return `urn:li:ugcPost:${ugcFromPosts[1]}`;
-    }
-
+    if (ugcFromPosts?.[1]) return `urn:li:ugcPost:${ugcFromPosts[1]}`;
     const activityFromPosts = full.match(/activity-(\d+)/i);
-    if (activityFromPosts?.[1]) {
-      return `urn:li:activity:${activityFromPosts[1]}`;
-    }
-
-    // Supports direct feed links like:
-    // /feed/update/urn:li:ugcPost:7449394278935707648/
+    if (activityFromPosts?.[1]) return `urn:li:activity:${activityFromPosts[1]}`;
     const feedUrn = full.match(/urn:li:(ugcPost|activity):(\d+)/i);
-    if (feedUrn?.[1] && feedUrn?.[2]) {
-      return `urn:li:${feedUrn[1]}:${feedUrn[2]}`;
-    }
-  } catch {
-    // Fall back to heuristic matching if URL parsing fails.
-  }
-
-  // Last-chance fallback for raw text that still contains LinkedIn IDs.
+    if (feedUrn?.[1] && feedUrn?.[2]) return `urn:li:${feedUrn[1]}:${feedUrn[2]}`;
+  } catch {}
   const ugcFallback = url.match(/ugcPost-(\d+)/i);
-  if (ugcFallback?.[1]) {
-    return `urn:li:ugcPost:${ugcFallback[1]}`;
-  }
-
+  if (ugcFallback?.[1]) return `urn:li:ugcPost:${ugcFallback[1]}`;
   const activityFallback = url.match(/activity-(\d+)/i);
-  if (activityFallback?.[1]) {
-    return `urn:li:activity:${activityFallback[1]}`;
-  }
-
+  if (activityFallback?.[1]) return `urn:li:activity:${activityFallback[1]}`;
   return url;
 }
 
@@ -192,16 +172,6 @@ function getInstagramEmbedUrl(url: string): string {
       const code = match[2];
       return `https://www.instagram.com/${type}/${code}/embed/`;
     }
-  } catch {
-    // fallback below
-  }
-
+  } catch {}
   return url;
-}
-
-// Extend window type for Instagram and LinkedIn scripts
-declare global {
-  interface Window {
-    IN: any;
-  }
 }

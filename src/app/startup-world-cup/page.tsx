@@ -1,15 +1,14 @@
+
 "use client";
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Rocket, Shield, Users, Trophy, Globe, Zap, ArrowRight, CheckCircle2 } from "lucide-react";
-import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 
 const SWC_LOGO_SRC = "https://static.wixstatic.com/media/9a1d63_ab519186f938416c8846e0010be6186d~mv2_d_2001_2457_s_2.png";
 const swccedatImage = "https://picsum.photos/seed/cedat/400/200";
-const handshakeIcon = "https://picsum.photos/seed/handshake/100/100";
 
 export default function StartupWorldCupPage() {
   return (
