@@ -5,8 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Rocket, Menu } from "lucide-react";
-import { useState } from "react";
+import { Rocket, Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
 import {
   Sheet,
   SheetContent,
@@ -16,6 +16,7 @@ import {
 const NAV_LINKS = [
   { name: "Home", href: "/" },
   { name: "Events", href: "/events" },
+  { name: "Programs", href: "/programs" },
   { name: "Startup World Cup", href: "/startup-world-cup" },
   { name: "Gallery", href: "/gallery" },
   { name: "Ask Us", href: "/ask-us" },
@@ -24,30 +25,53 @@ const NAV_LINKS = [
 export function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-md">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="/" className="flex items-center space-x-2">
-          <Rocket className="h-6 w-6 text-primary" />
-          <span className="text-xl font-bold text-primary font-headline">Cedat</span>
+    <nav className={cn(
+      "fixed top-0 z-50 w-full transition-all duration-300",
+      scrolled ? "bg-white/90 backdrop-blur-lg shadow-sm border-b h-20" : "bg-transparent h-24"
+    )}>
+      <div className="container mx-auto flex h-full items-center justify-between px-4">
+        <Link href="/" className="flex items-center space-x-2 group">
+          <div className="bg-primary p-2 rounded-xl group-hover:rotate-12 transition-transform">
+            <Rocket className="h-6 w-6 text-white" />
+          </div>
+          <span className={cn(
+            "text-2xl font-black font-headline transition-colors",
+            scrolled ? "text-primary" : "text-white"
+          )}>Cedat</span>
         </Link>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex items-center space-x-8">
+        <div className="hidden md:flex items-center space-x-10">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               className={cn(
-                "text-sm font-medium transition-colors hover:text-primary",
-                pathname === link.href ? "text-primary font-semibold" : "text-muted-foreground"
+                "text-sm font-bold transition-all hover:text-secondary relative group",
+                pathname === link.href 
+                  ? (scrolled ? "text-primary" : "text-secondary") 
+                  : (scrolled ? "text-muted-foreground" : "text-white/80")
               )}
             >
               {link.name}
+              <span className={cn(
+                "absolute -bottom-1 left-0 w-0 h-0.5 bg-secondary transition-all group-hover:w-full",
+                pathname === link.href && "w-full"
+              )} />
             </Link>
           ))}
-          <Button asChild className="rounded-full px-6">
+          <Button asChild className="rounded-full px-8 bg-secondary hover:bg-secondary/90 text-white font-bold h-11">
             <Link href="/login">Sign In</Link>
           </Button>
         </div>
@@ -56,28 +80,33 @@ export function Navbar() {
         <div className="md:hidden">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
+              <Button variant="ghost" size="icon" className={cn(scrolled ? "text-primary" : "text-white")}>
+                <Menu className="h-8 w-8" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-              <div className="flex flex-col space-y-4 mt-8">
+            <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-white">
+              <div className="flex flex-col space-y-6 mt-12">
                 {NAV_LINKS.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
                     onClick={() => setIsOpen(false)}
                     className={cn(
-                      "text-lg font-medium transition-colors hover:text-primary",
-                      pathname === link.href ? "text-primary font-semibold" : "text-muted-foreground"
+                      "text-2xl font-extrabold transition-colors hover:text-primary",
+                      pathname === link.href ? "text-primary" : "text-muted-foreground"
                     )}
                   >
                     {link.name}
                   </Link>
                 ))}
-                <Button asChild className="rounded-full w-full">
-                  <Link href="/login" onClick={() => setIsOpen(false)}>Sign In</Link>
-                </Button>
+                <div className="pt-8 space-y-4">
+                  <Button asChild className="rounded-full w-full h-14 text-lg font-bold">
+                    <Link href="/login" onClick={() => setIsOpen(false)}>Sign In</Link>
+                  </Button>
+                  <Button asChild variant="outline" className="rounded-full w-full h-14 text-lg font-bold border-2">
+                    <Link href="/register" onClick={() => setIsOpen(false)}>Create Account</Link>
+                  </Button>
+                </div>
               </div>
             </SheetContent>
           </Sheet>

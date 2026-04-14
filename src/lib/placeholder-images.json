@@ -53,6 +53,18 @@
       "description": "Startup World Cup Stage",
       "imageUrl": "https://picsum.photos/seed/swc1/1200/500",
       "imageHint": "innovation award"
+    },
+    {
+      "id": "program-incubation",
+      "description": "Startup incubation session",
+      "imageUrl": "https://picsum.photos/seed/prog1/600/400",
+      "imageHint": "mentorship session"
+    },
+    {
+      "id": "program-acceleration",
+      "description": "Acceleration program workshop",
+      "imageUrl": "https://picsum.photos/seed/prog2/600/400",
+      "imageHint": "business growth"
     }
   ]
 }

@@ -5,8 +5,8 @@
 
 @layer base {
   :root {
-    --background: 180 14% 94%; /* #ECF2F2 */
-    --foreground: 216 5% 21%; /* #313336 */
+    --background: 210 20% 98%; /* Soft Neutral White */
+    --foreground: 216 5% 21%; /* Dark Slate Gray */
     --card: 0 0% 100%;
     --card-foreground: 216 5% 21%;
     --popover: 0 0% 100%;
@@ -24,7 +24,7 @@
     --border: 180 10% 85%;
     --input: 180 10% 85%;
     --ring: 180 100% 25%;
-    --radius: 1rem; /* rounded-2xl roughly */
+    --radius: 1.5rem; /* Larger default radius for a softer feel */
   }
   .dark {
     --background: 216 5% 10%;
@@ -58,6 +58,15 @@
   }
 }
 
+/* Custom Utilities */
+.font-headline {
+  letter-spacing: -0.02em;
+}
+
+.shadow-soft {
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+}
+
 .timeline-line {
   position: absolute;
   left: 20px;
@@ -65,4 +74,15 @@
   bottom: 0;
   width: 2px;
   @apply bg-primary/20;
+}
+
+/* Animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
 }
