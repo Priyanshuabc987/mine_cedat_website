@@ -1,5 +1,5 @@
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
+import { API_BASE_URL } from "./queryClient";
 
 const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
@@ -11,7 +11,13 @@ const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
 };
 
 export const eventsAPI = {
-  listEvents: (params: any) => fetch(`${API_BASE_URL}/api/events?${new URLSearchParams(params)}`),
+  listEvents: (params: any) => {
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined) searchParams.append(key, String(value));
+    });
+    return fetch(`${API_BASE_URL}/api/events?${searchParams.toString()}`);
+  },
   getEvent: (id: string) => fetch(`${API_BASE_URL}/api/events/${id}`),
 };
 
