@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { useParams, useLocation, Link } from 'wouter';
+import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Html5Qrcode } from 'html5-qrcode';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -55,8 +56,8 @@ function parseQrCodeForVerify(raw: string): string {
 }
 
 export default function AdminEventManagePage() {
-  const { id } = useParams<{ id: string }>();
-  const [, setLocation] = useLocation();
+  const { id } = useParams() as { id: string };
+  const router = useRouter();
   const { toast } = useToast();
   const [editOpen, setEditOpen] = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
@@ -91,7 +92,6 @@ export default function AdminEventManagePage() {
     handleSubmit,
     setValue,
     watch,
-    reset,
     formState: { errors },
   } = useForm<EventFormData>({
     resolver: zodResolver(eventSchema),
@@ -104,21 +104,18 @@ export default function AdminEventManagePage() {
   });
 
   const onSectionChange = (s: string) => {
-    setLocation(s === 'overview' ? '/admin' : `/admin?section=${s}`);
+    router.push(s === 'overview' ? '/admin' : `/admin?section=${s}`);
   };
 
-  // Scanner: start when modal opens, stop when closes
   useEffect(() => {
     if (!scannerOpen || !id) return;
-    const el = document.getElementById(qrReaderId);
-    if (!el) return;
     const html5Qr = new Html5Qrcode(qrReaderId);
     scannerRef.current = html5Qr;
     setVerifiedResult(null);
 
     html5Qr
       .start({ facingMode: 'environment' }, { fps: 10 }, (decodedText) => {
-        if (verifiedResult?.type === 'ok') return; // wait for Mark as Attended or close
+        if (verifiedResult?.type === 'ok') return;
         const qr = parseQrCodeForVerify(decodedText);
         if (!qr) return;
         verifyQR.mutateAsync(qr)
@@ -160,7 +157,7 @@ export default function AdminEventManagePage() {
       html5Qr.stop().then(() => html5Qr.clear()).catch(() => {});
       scannerRef.current = null;
     };
-  }, [scannerOpen, id]);
+  }, [scannerOpen, id, verifyQR, toast, verifiedResult?.type]);
 
   const handleUpdate = async (data: EventFormData) => {
     if (!id) return;
@@ -178,7 +175,7 @@ export default function AdminEventManagePage() {
     try {
       await deleteEvent.mutateAsync(id);
       toast({ title: 'Event deleted' });
-      setLocation('/admin?section=events');
+      router.push('/admin?section=events');
     } catch {
       toast({ title: 'Error', description: 'Failed to delete event.', variant: 'destructive' });
     }
@@ -259,10 +256,8 @@ export default function AdminEventManagePage() {
       setQrManual('');
       if (scannerOpen) {
         setScannerOpen(false);
-        toast({ title: 'Checked in', description: 'Attendee marked as attended.' });
-      } else {
-        toast({ title: 'Checked in', description: 'Attendee marked as attended.' });
       }
+      toast({ title: 'Checked in', description: 'Attendee marked as attended.' });
     } catch {
       toast({ title: 'Error', description: 'Check-in failed.', variant: 'destructive' });
     }
@@ -411,12 +406,11 @@ export default function AdminEventManagePage() {
     setEditOpen(true);
   };
 
-  const stats = regData?.statistics || { total_registered: 0, total_attended: 0 };
+  const stats = regData?.statistics || { total_registered: 0, total_attended: 0, total_pending: 0 };
 
   return (
     <AdminLayout sections={adminSections} activeSection="events" onSectionChange={onSectionChange}>
       <div className="space-y-6">
-        {/* Header */}
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-2">
             <Link href="/admin?section=events">
@@ -451,7 +445,6 @@ export default function AdminEventManagePage() {
           </div>
         </div>
 
-        {/* Event images */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle>Event images</CardTitle>
@@ -465,7 +458,7 @@ export default function AdminEventManagePage() {
               <p className="text-muted-foreground py-4">No images yet. Use Upload images above.</p>
             ) : (
               <div className="space-y-3">
-                {sortedImages.map((img: { id: string; image_url?: string; caption?: string; display_order?: number }, i: number) => {
+                {sortedImages.map((img: any, i: number) => {
                   const isFeatured =
                     (img.image_url || '').split('?')[0] === (event?.featured_image_url || '').split('?')[0];
                   return (
@@ -568,7 +561,6 @@ export default function AdminEventManagePage() {
           </CardContent>
         </Card>
 
-        {/* Registrations */}
         <Card>
           <CardHeader>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -678,7 +670,6 @@ export default function AdminEventManagePage() {
           </CardContent>
         </Card>
 
-        {/* QR Check-In */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -686,7 +677,7 @@ export default function AdminEventManagePage() {
               QR Check-In
             </CardTitle>
             <p className="text-sm text-muted-foreground">
-              Use on event day to scan attendee QR codes or paste the code if the camera is unavailable.
+              Use on event day to scan attendee QR codes.
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -715,16 +706,6 @@ export default function AdminEventManagePage() {
             {verifyQR.error && (
               <Alert variant="destructive">
                 <AlertDescription>Invalid QR code. Please check and try again.</AlertDescription>
-              </Alert>
-            )}
-            {verifiedResult?.type === 'wrong_event' && (
-              <Alert variant="destructive">
-                <AlertDescription>This QR is for a different event.</AlertDescription>
-              </Alert>
-            )}
-            {verifiedResult?.type === 'already_attended' && (
-              <Alert>
-                <AlertDescription>Already checked in.</AlertDescription>
               </Alert>
             )}
             {verifiedResult?.type === 'ok' && verifiedResult.registration && (
@@ -757,7 +738,6 @@ export default function AdminEventManagePage() {
         </Card>
       </div>
 
-      {/* Edit Dialog */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="max-w-2xl w-[calc(100vw-2rem)] sm:w-full max-h-[90vh] overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
@@ -775,7 +755,6 @@ export default function AdminEventManagePage() {
         </DialogContent>
       </Dialog>
 
-      {/* Upload Dialog */}
       <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
         <DialogContent className="w-[calc(100vw-2rem)] max-w-lg p-4 sm:p-6">
           <DialogHeader>
@@ -801,7 +780,6 @@ export default function AdminEventManagePage() {
         registrationId={detailRegistrationId}
       />
 
-      {/* Scanner Modal */}
       <Dialog open={scannerOpen} onOpenChange={(o) => { setScannerOpen(o); setVerifiedResult(null); }}>
         <DialogContent className="max-w-md w-[calc(100vw-2rem)] p-4 sm:p-6">
           <DialogHeader>

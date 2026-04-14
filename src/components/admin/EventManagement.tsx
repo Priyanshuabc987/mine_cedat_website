@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Loader2, Plus, Edit, Trash2, Users, Upload, Link as LinkIcon } from 'lucide-react';
-import { Link } from 'wouter';
+import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { useEvents, useCreateEvent, useUpdateEvent, useDeleteEvent, useUploadEventImage } from '@/hooks/useEvents';
 import { format } from 'date-fns';
@@ -77,7 +77,6 @@ export function EventManagement() {
   const handleCreateEvent = async (data: EventFormData) => {
     setIsCreating(true);
     try {
-      // Build a plain serializable payload for the API (avoid passing form state that may contain refs/DOM)
       const payload: any = {
         title: data.title,
         description: data.description ?? undefined,
@@ -90,21 +89,18 @@ export function EventManagement() {
         external_registration_url: data.external_registration_url && data.external_registration_url.trim() ? data.external_registration_url.trim() : undefined,
       };
       
-      // If URL is provided, include it in the create payload
       if (imageInputType === 'url' && data.featured_image_url && data.featured_image_url.trim()) {
         payload.featured_image_url = data.featured_image_url.trim();
       }
       
       const created = await createEvent.mutateAsync(payload);
       
-      // Handle file uploads (for gallery images)
       let firstImageUrl: string | null = null;
       if (imageInputType === 'upload' && pendingImages.length > 0) {
         for (let i = 0; i < pendingImages.length; i++) {
           const res = await uploadImage.mutateAsync({ eventId: created.id, file: pendingImages[i] });
           if (i === 0) firstImageUrl = res.image_url;
         }
-        // If we uploaded files and no URL was set, use first uploaded image as featured
         if (firstImageUrl && !payload.featured_image_url) {
           await updateEvent.mutateAsync({ eventId: created.id, eventData: { featured_image_url: firstImageUrl } });
         }
@@ -146,24 +142,20 @@ export function EventManagement() {
         external_registration_url: data.external_registration_url && data.external_registration_url.trim() ? data.external_registration_url.trim() : undefined,
       };
       
-      // If URL is provided, include it in the update payload
       if (imageInputType === 'url' && data.featured_image_url && data.featured_image_url.trim()) {
         payload.featured_image_url = data.featured_image_url.trim();
       } else if (imageInputType === 'url' && (!data.featured_image_url || !data.featured_image_url.trim())) {
-        // If switching to URL but no URL provided, clear it
         payload.featured_image_url = null;
       }
       
       await updateEvent.mutateAsync({ eventId: editingEvent.id, eventData: payload });
       
-      // Handle file uploads for edit (add to gallery)
       if (imageInputType === 'upload' && pendingImages.length > 0) {
         let firstImageUrl: string | null = null;
         for (let i = 0; i < pendingImages.length; i++) {
           const res = await uploadImage.mutateAsync({ eventId: editingEvent.id, file: pendingImages[i] });
           if (i === 0) firstImageUrl = res.image_url;
         }
-        // If no featured image exists and we uploaded files, set first as featured
         if (!editingEvent.featured_image_url && firstImageUrl) {
           await updateEvent.mutateAsync({ eventId: editingEvent.id, eventData: { featured_image_url: firstImageUrl } });
         }
@@ -260,7 +252,6 @@ export function EventManagement() {
         </Dialog>
       </div>
 
-      {/* Events Table */}
       <Card>
         <CardHeader>
           <CardTitle>All Events</CardTitle>
@@ -332,7 +323,6 @@ export function EventManagement() {
                           setValue('category', event.category ?? '');
                           setValue('theme', event.theme ?? '');
                           setValue('external_registration_url', event.external_registration_url || '');
-                          // Set image URL if exists, otherwise default to upload
                           if (event.featured_image_url) {
                             setValue('featured_image_url', event.featured_image_url);
                             setImageInputType('url');
@@ -362,7 +352,6 @@ export function EventManagement() {
         </CardContent>
       </Card>
 
-      {/* Edit Event Dialog */}
       <Dialog open={!!editingEvent} onOpenChange={(open) => !open && setEditingEvent(null)}>
         <DialogContent className="max-w-2xl w-[calc(100vw-2rem)] sm:w-full max-h-[90vh] overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
@@ -385,7 +374,6 @@ export function EventManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* Image Upload Dialog */}
       <Dialog open={!!selectedEventForImages} onOpenChange={(open) => !open && setSelectedEventForImages(null)}>
         <DialogContent className="w-[calc(100vw-2rem)] max-w-lg p-4 sm:p-6">
           <DialogHeader>
@@ -417,7 +405,6 @@ export function EventManagement() {
           </div>
         </DialogContent>
       </Dialog>
-
     </div>
   );
 }
@@ -537,7 +524,6 @@ export function EventForm({ onSubmit, onCancel, register, setValue, watch, error
         <div className="space-y-3">
           <Label>Featured Image (optional)</Label>
           
-          {/* Toggle between Upload and URL */}
           <div className="flex gap-2">
             <Button
               type="button"
@@ -568,7 +554,6 @@ export function EventForm({ onSubmit, onCancel, register, setValue, watch, error
             </Button>
           </div>
 
-          {/* Upload Option */}
           {imageInputType === 'upload' && (
             <div className="space-y-2">
               <Input
@@ -597,7 +582,6 @@ export function EventForm({ onSubmit, onCancel, register, setValue, watch, error
             </div>
           )}
 
-          {/* URL Option */}
           {imageInputType === 'url' && (
             <div className="space-y-2">
               <Input
@@ -611,14 +595,13 @@ export function EventForm({ onSubmit, onCancel, register, setValue, watch, error
                 <p className="text-sm text-destructive">{errors.featured_image_url.message}</p>
               )}
               <p className="text-xs text-muted-foreground">
-                Enter a direct link to an image (e.g., https://cedat-uploads-123.s3.ap-south-1.amazonaws.com/cedatevents/image.jpg)
+                Enter a direct link to an image
               </p>
             </div>
           )}
         </div>
       )}
 
-      {/* External Registration URL */}
       <div className="space-y-2">
         <Label htmlFor="external_registration_url">External Registration URL (optional)</Label>
         <Input

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useLocation } from 'wouter';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 
 interface AuthGuardProps {
@@ -10,21 +10,22 @@ interface AuthGuardProps {
 
 export function AuthGuard({ children, requireAdmin = false, redirectTo = '/login' }: AuthGuardProps) {
   const { isAuthenticated, user, isLoading } = useAuth();
-  const [, setLocation] = useLocation();
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!isLoading) {
       if (!isAuthenticated) {
-        setLocation(redirectTo);
+        router.push(redirectTo);
         return;
       }
 
       if (requireAdmin && user && !user.is_admin) {
-        setLocation('/');
+        router.push('/');
         return;
       }
     }
-  }, [isAuthenticated, user, isLoading, requireAdmin, redirectTo, setLocation]);
+  }, [isAuthenticated, user, isLoading, requireAdmin, redirectTo, router]);
 
   if (isLoading) {
     return (
@@ -44,5 +45,3 @@ export function AuthGuard({ children, requireAdmin = false, redirectTo = '/login
 
   return <>{children}</>;
 }
-
-

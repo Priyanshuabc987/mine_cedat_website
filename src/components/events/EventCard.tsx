@@ -1,4 +1,4 @@
-import { Link } from 'wouter';
+import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -126,12 +126,10 @@ export function EventCard({
               <Button
                 size="sm"
                 onClick={() => {
-                  // Check for external registration URL first
                   if (event.external_registration_url) {
                     window.open(event.external_registration_url, '_blank');
                     return;
                   }
-                  // Otherwise use internal registration
                   onRegister?.();
                 }}
                 disabled={

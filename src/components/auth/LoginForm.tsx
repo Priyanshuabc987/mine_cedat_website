@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Link, useLocation } from 'wouter';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,7 +21,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [, setLocation] = useLocation();
+  const router = useRouter();
   const { login, isLoginLoading, loginError, isAuthenticated, user } = useAuth();
 
   const {
@@ -31,14 +32,12 @@ export function LoginForm() {
     resolver: zodResolver(loginSchema),
   });
 
-  // Redirect to profile page when authenticated
   useEffect(() => {
     if (isAuthenticated && user?.profile_slug) {
-      setLocation(`/member/${user.profile_slug}`);
+      router.push(`/member/${user.profile_slug}`);
     }
-  }, [isAuthenticated, user?.profile_slug, setLocation]);
+  }, [isAuthenticated, user?.profile_slug, router]);
 
-  // Redirect if already authenticated
   if (isAuthenticated && user?.profile_slug) {
     return null;
   }
@@ -46,7 +45,6 @@ export function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await login(data);
-      // User will be fetched by useAuth hook, useEffect will handle redirect
     } catch (error) {
       // Error handled by useAuth hook
     }

@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, CheckCircle, Loader2 } from "lucide-react";
-import { Link, useLocation } from "wouter";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { useFICEvent, useRegisterForEvent } from "@/hooks/useEvents";
 import { useAuth } from "@/hooks/useAuth";
@@ -40,7 +41,7 @@ function linkifyText(text: string) {
 }
 
 export default function FIC() {
-  const [, setLocation] = useLocation();
+  const router = useRouter();
   const { toast } = useToast();
   const { data: event, isLoading, error } = useFICEvent();
   const { user, isAuthenticated } = useAuth();
@@ -67,7 +68,7 @@ export default function FIC() {
     if (!isAuthenticated) {
       sessionStorage.setItem('intended_event', event.id);
       sessionStorage.setItem('intended_redirect', '/fic');
-      setLocation('/register');
+      router.push('/register');
       return;
     }
     if (isRegistered) return;
@@ -100,7 +101,7 @@ export default function FIC() {
       } else {
         toast({
           title: "Registration successful",
-          description: "You're registered for FIC. Check your email for the QR code.",
+          description: "You're registered for FIC.",
         });
       }
       setShowFICForm(false);
@@ -138,7 +139,7 @@ export default function FIC() {
                 FIC event coming soon
               </h1>
               <p className="text-slate-300 max-w-2xl mx-auto">
-                The flagship FIC event is being curated. Once published by the admin, full details will appear here.
+                The flagship FIC event is being curated.
               </p>
             </div>
           </div>
@@ -162,17 +163,11 @@ export default function FIC() {
     hour12: true,
   });
 
-  const description =
-    event.description ||
-    `Join us for ${event.title} on ${dateText}. This FIC experience is curated by CEDAT for the ecosystem.`;
-
   return (
     <>
       {generateSEO({
         title: event.title || "FIC – CEDAT Flagship Event",
-        description,
-        keywords:
-          "FIC, CEDAT flagship event, founder meetups bangalore, startup networking events bangalore, startup pitch events bangalore, startup community in bangalore, startup workshops bangalore, startup events in bengaluru, bengaluru startup meetups, Startup community meetups, Founders community meetup, Startup Pitches",
+        description: event.description || "Join us for FIC",
         image: featuredImage,
         url: "/fic",
         type: "event",
@@ -196,7 +191,6 @@ export default function FIC() {
               </Link>
             </div>
 
-            {/* 1. Image first */}
             <section className="space-y-8 sm:space-y-10">
               <div className="relative max-w-4xl mx-auto">
                 <div className="rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-950 to-black p-[2px] shadow-[0_0_60px_rgba(56,189,248,0.3)]">
@@ -216,14 +210,12 @@ export default function FIC() {
                 </div>
               </div>
 
-              {/* 2. Title */}
               <div className="text-center max-w-3xl mx-auto">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold leading-tight">
                   {event.title}
                 </h1>
               </div>
 
-              {/* 3. Date, time, location */}
               <div className="grid gap-4 sm:gap-5 sm:grid-cols-3 max-w-3xl mx-auto">
                 <div className="rounded-2xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-center sm:text-left">
                   <div className="text-xs uppercase tracking-wide text-slate-400 mb-1">Date</div>
@@ -243,7 +235,6 @@ export default function FIC() {
                 )}
               </div>
 
-              {/* 4. Confirm participation / FIC form */}
               <div className="space-y-6">
                 <div className="flex justify-center">
                   {isRegistered ? (
@@ -276,7 +267,7 @@ export default function FIC() {
                         <Input
                           value={user.full_name}
                           readOnly
-                          className="bg-slate-900/60 border-slate-600 text-slate-100 placeholder:text-slate-500"
+                          className="bg-slate-900/60 border-slate-600 text-slate-100"
                         />
                       </div>
                       <div className="space-y-1">
@@ -284,51 +275,13 @@ export default function FIC() {
                         <Input
                           value={user.email}
                           readOnly
-                          className="bg-slate-900/60 border-slate-600 text-slate-100 placeholder:text-slate-500"
+                          className="bg-slate-900/60 border-slate-600 text-slate-100"
                         />
                       </div>
-                      {user.phone && (
-                        <div className="space-y-1">
-                          <Label className="text-xs uppercase text-slate-400">Phone Number</Label>
-                          <Input
-                            value={user.phone}
-                            readOnly
-                            className="bg-slate-900/60 border-slate-600 text-slate-100 placeholder:text-slate-500"
-                          />
-                        </div>
-                      )}
-                      <div className="space-y-1">
-                        <Label className="text-xs uppercase text-slate-400">LinkedIn Profile</Label>
-                        <Input
-                          value={user.linkedin_url}
-                          readOnly
-                          className="bg-slate-900/60 border-slate-600 text-slate-100 placeholder:text-slate-500"
-                        />
-                      </div>
-                      {user.designation && (
-                        <div className="space-y-1">
-                          <Label className="text-xs uppercase text-slate-400">Designation</Label>
-                          <Input
-                            value={user.designation}
-                            readOnly
-                            className="bg-slate-900/60 border-slate-600 text-slate-100 placeholder:text-slate-500"
-                          />
-                        </div>
-                      )}
-                      {user.company_name && (
-                        <div className="space-y-1">
-                          <Label className="text-xs uppercase text-slate-400">Company / Website</Label>
-                          <Input
-                            value={user.company_name}
-                            readOnly
-                            className="bg-slate-900/60 border-slate-600 text-slate-100 placeholder:text-slate-500"
-                          />
-                        </div>
-                      )}
 
                       <div className="space-y-2 pt-2">
                         <Label className="text-sm text-slate-100">
-                          Interested for networking with Investors, Mentors, Enablers, Professionals & Entrepreneurs. Costs 499/- *
+                          Interested for networking? *
                         </Label>
                         <Select
                           value={networkingInterest}
@@ -346,7 +299,7 @@ export default function FIC() {
 
                       <div className="space-y-2">
                         <Label className="text-sm text-slate-100">
-                          Want to pitch your startup? We will share a link to submit your pitch deck. Only shortlisted startups will be invited to present on event day. A fee of ₹4999 applies only to shortlisted & confirmed startups to pitch on 7th March 2026 *
+                          Want to pitch your startup? *
                         </Label>
                         <Select
                           value={pitchInterest}
@@ -366,7 +319,7 @@ export default function FIC() {
                         <Button
                           type="button"
                           variant="outline"
-                          className="min-h-[40px] border-slate-700 text-slate-200"
+                          className="min-h-[40px]"
                           onClick={() => {
                             setShowFICForm(false);
                             setNetworkingInterest("");
@@ -377,18 +330,11 @@ export default function FIC() {
                         </Button>
                         <Button
                           type="button"
-                          className="min-h-[40px] bg-cyan-500 hover:bg-cyan-400 text-black font-semibold"
+                          className="min-h-[40px] bg-cyan-500 hover:bg-cyan-400 text-black"
                           onClick={handleSubmitFICForm}
                           disabled={registerMutation.isPending}
                         >
-                          {registerMutation.isPending ? (
-                            <>
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              Confirming...
-                            </>
-                          ) : (
-                            "Confirm participation"
-                          )}
+                          {registerMutation.isPending ? "Confirming..." : "Confirm participation"}
                         </Button>
                       </div>
                     </CardContent>
@@ -396,7 +342,6 @@ export default function FIC() {
                 )}
               </div>
 
-              {/* 5. Description at last */}
               {event.description && (
                 <div className="max-w-3xl mx-auto pt-4 border-t border-slate-800">
                   <h2 className="text-lg font-semibold text-slate-200 mb-3">About this event</h2>
@@ -405,28 +350,6 @@ export default function FIC() {
                       <p key={i} className="mb-3 last:mb-0">
                         {linkifyText(paragraph)}
                       </p>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* 6. FIC Gallery - uses event images uploaded via admin */}
-              {event.images && event.images.length > 0 && (
-                <div className="max-w-5xl mx-auto pt-8">
-                  <h2 className="text-lg font-semibold text-slate-200 mb-4">FIC Gallery</h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
-                    {event.images.map((img: any, index: number) => (
-                      <div
-                        key={img.id ?? index}
-                        className="aspect-[4/3] rounded-xl overflow-hidden border border-slate-800 bg-slate-950/60"
-                      >
-                        <img
-                          src={getImageUrl(img.image_url)}
-                          alt={img.caption || `FIC gallery image ${index + 1}`}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
-                        />
-                      </div>
                     ))}
                   </div>
                 </div>
@@ -440,4 +363,3 @@ export default function FIC() {
     </>
   );
 }
-

@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 import { generateSEO, seoConfigs } from "@/lib/seo";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import Link from "next/link";
 import { Home } from "lucide-react";
 
 export default function NotFound() {
@@ -18,7 +18,7 @@ export default function NotFound() {
             </div>
 
             <p className="mt-4 text-sm text-muted-foreground mb-6">
-              The page you're looking for doesn't exist or has been moved. Return to the homepage to explore our startup ecosystem.
+              The page you're looking for doesn't exist.
             </p>
 
             <Link href="/">

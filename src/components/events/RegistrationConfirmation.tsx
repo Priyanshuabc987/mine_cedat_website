@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, QrCode, Calendar, MapPin, Download, X, Loader2, RefreshCw, Clock } from 'lucide-react';
-import { Link } from 'wouter';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getImageUrl } from '@/lib/images';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
@@ -65,7 +65,6 @@ export function RegistrationConfirmation({
   const showRegenerate = Boolean(registrationData.id && onRegenerateSuccess && !isPending);
 
   useEffect(() => {
-    // Subtle confetti animation - minimal, 150-300ms
     const timer = setTimeout(() => setShowConfetti(false), 250);
     return () => clearTimeout(timer);
   }, []);
@@ -109,7 +108,6 @@ export function RegistrationConfirmation({
         >
           <Card className="border-0 shadow-none">
             <CardContent className="p-4 sm:p-6 md:p-8">
-              {/* Close Button */}
               {onClose && (
                 <div className="flex justify-end mb-3 sm:mb-4">
                   <Button
@@ -124,7 +122,6 @@ export function RegistrationConfirmation({
                 </div>
               )}
 
-              {/* Confetti Animation (Subtle) */}
               {showConfetti && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0 }}
@@ -137,7 +134,6 @@ export function RegistrationConfirmation({
                 </motion.div>
               )}
 
-              {/* Success / Pending Icon */}
               <div className="flex justify-center mb-4 sm:mb-6">
                 <motion.div
                   initial={{ scale: 0 }}
@@ -161,7 +157,6 @@ export function RegistrationConfirmation({
                 </motion.div>
               </div>
 
-              {/* Main Message */}
               <div className="text-center space-y-3 sm:space-y-4 mb-4 sm:mb-6 md:mb-8">
                 <h1 className="text-xl sm:text-2xl md:text-3xl font-display font-bold leading-tight break-words px-2">
                   {isPending ? "Your registration is pending approval" : "You're Officially Part of This CEDAT Event"}
@@ -180,7 +175,6 @@ export function RegistrationConfirmation({
                 )}
               </div>
 
-              {/* Event Details */}
               <Card className="mb-4 sm:mb-6 bg-muted/50">
                 <CardContent className="p-4 sm:p-6 space-y-3 sm:space-y-4">
                   <div className="space-y-2 sm:space-y-3">
@@ -201,7 +195,6 @@ export function RegistrationConfirmation({
                 </CardContent>
               </Card>
 
-              {/* QR Code or Pending message */}
               {isPending ? (
                 <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 sm:p-6 mb-4 sm:mb-6">
                   <p className="text-center text-sm sm:text-base text-muted-foreground">
@@ -252,7 +245,7 @@ export function RegistrationConfirmation({
                             onClick={handleRegenerate}
                             disabled={regenerating}
                           >
-                            {regenerating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-2" />}
+                            {regenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-2" />}
                             {regenerating ? 'Regenerating…' : 'Regenerate QR Code'}
                           </Button>
                         )}
@@ -268,7 +261,6 @@ export function RegistrationConfirmation({
                 </div>
               )}
 
-              {/* Action Buttons */}
               <div className="space-y-3">
                 {calendarUrl && (
                   <Button
@@ -317,7 +309,6 @@ export function RegistrationConfirmation({
                 </div>
               </div>
 
-              {/* Instructions */}
               <div className="mt-6 pt-6 border-t">
                 <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                   <h4 className="font-medium text-blue-900 dark:text-blue-100 text-sm mb-2">
@@ -344,4 +335,3 @@ export function RegistrationConfirmation({
     </AnimatePresence>
   );
 }
-

@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { EventManagement } from '@/components/admin/EventManagement';
-// Members + Registrations temporarily hidden from admin UI
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAdminStats } from '@/hooks/useAdmin';
 import { generateSEO, seoConfigs } from '@/lib/seo';
@@ -22,18 +22,22 @@ export const adminSections = [
   { id: 'social', label: 'Social Media', icon: FileText },
 ];
 
-function getInitialSection(): string {
-  try {
-    const p = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-    const s = p.get('section');
-    if (s && ['overview', 'events', 'fic', 'content', 'hero', 'gallery', 'social'].includes(s)) return s;
-  } catch (_) { }
-  return 'overview';
-}
-
 export default function AdminDashboard() {
-  const [activeSection, setActiveSection] = useState(getInitialSection);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [activeSection, setActiveSection] = useState('overview');
   const { data: stats, isLoading: statsLoading } = useAdminStats();
+
+  useEffect(() => {
+    const s = searchParams.get('section');
+    if (s && adminSections.some(section => section.id === s)) {
+      setActiveSection(s);
+    }
+  }, [searchParams]);
+
+  const onSectionChange = (s: string) => {
+    router.push(s === 'overview' ? '/admin' : `/admin?section=${s}`);
+  };
 
   const renderContent = () => {
     switch (activeSection) {
@@ -45,7 +49,6 @@ export default function AdminDashboard() {
               <p className="text-sm sm:text-base text-muted-foreground break-words">Manage CEDAT events, members, and registrations</p>
             </div>
 
-            {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -102,9 +105,8 @@ export default function AdminDashboard() {
               </Card>
             </div>
 
-            {/* Quick Actions */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              <Card className="cursor-pointer hover:shadow-md transition-shadow min-h-[44px]" onClick={() => setActiveSection('events')}>
+              <Card className="cursor-pointer hover:shadow-md transition-shadow min-h-[44px]" onClick={() => onSectionChange('events')}>
                 <CardContent className="p-4 sm:p-6 text-center">
                   <Calendar className="h-10 w-10 sm:h-12 sm:w-12 text-accent mx-auto mb-3 sm:mb-4" />
                   <h3 className="font-semibold mb-2 text-sm sm:text-base">Manage Events</h3>
@@ -117,22 +119,16 @@ export default function AdminDashboard() {
 
       case 'events':
         return <EventManagement />;
-
       case 'fic':
         return <FICManagement />;
-
       case 'content':
         return <ContentManagement />;
-
       case 'hero':
         return <HeroManagement />;
-
       case 'gallery':
         return <GalleryManagement />;
-
       case 'social':
         return <SocialPostManagement />;
-
       default:
         return <div>Section not found</div>;
     }
@@ -144,7 +140,7 @@ export default function AdminDashboard() {
       <AdminLayout
         sections={adminSections}
         activeSection={activeSection}
-        onSectionChange={setActiveSection}
+        onSectionChange={onSectionChange}
       >
         {renderContent()}
       </AdminLayout>
