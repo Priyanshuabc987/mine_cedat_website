@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { EventList } from "@/components/events/EventList";
+import { Ecosystem } from "@/components/home/Ecosystem";
 
 export default function Home() {
   return (
@@ -15,7 +16,7 @@ export default function Home() {
 
       {/* Metrics Section */}
       <section className="container mx-auto px-4 -mt-16 relative z-20">
-        <div className="bg-white rounded-3xl p-8 sm:p-12 shadow-2xl border flex flex-wrap justify-between gap-8 text-center">
+        <div className="bg-white rounded-3xl p-3 py-6 sm:p-12 shadow-2xl border flex flex-wrap justify-between gap-8 text-center">
           <div className="flex-1 min-w-[120px]">
             <div className="text-3xl sm:text-4xl font-black text-primary">30K+</div>
             <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">Members</div>
@@ -32,6 +33,10 @@ export default function Home() {
             <div className="text-3xl sm:text-4xl font-black text-primary">80+</div>
             <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">Partners</div>
           </div>
+          <div className="flex-1 min-w-[120px]">
+            <div className="text-3xl sm:text-4xl font-black text-primary">30+</div>
+            <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">Communities</div>
+          </div>
         </div>
       </section>
 
@@ -40,7 +45,7 @@ export default function Home() {
         <div className="flex flex-col md:flex-row justify-between items-start mb-12 gap-6">
           <div className="space-y-4">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-foreground">
-              Startup <span className="text-accent italic">Meetups & Events</span>
+              Startup <span className="text-primary italic">Meetups & Events</span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-xl">
               Connecting startups and innovators into one powerful network.
@@ -58,6 +63,8 @@ export default function Home() {
       </section>
 
       <SocialFeed />
+
+      <Ecosystem />
 
       {/* Programs Teaser */}
       <section className="py-24 pb-10 bg-primary text-white overflow-hidden relative">
@@ -77,7 +84,7 @@ export default function Home() {
                 </Button>
               </Link>
               <Link href="/ask-us">
-                <Button size="lg" variant="outline" className="rounded-full border-2 border-white text-white hover:bg-white/10 px-10 h-16 text-lg">
+                <Button size="lg" variant="outline" className="rounded-full border-2 border-white text-black hover:bg-white/10 px-10 h-16 text-lg">
                   Inquire Further
                 </Button>
               </Link>

@@ -40,7 +40,7 @@ export default function StartupWorldCupPage() {
               className="mt-4 text-lg sm:text-xl md:text-2xl font-bold text-accent max-w-2xl mx-auto"
             >
               Bangalore Regional
-            </motion.p> */}
+            </p> */}
         </div>
 
         <motion.div 
@@ -49,22 +49,22 @@ export default function StartupWorldCupPage() {
           transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
           className="relative z-20 w-full container mx-auto px-4 sm:px-6 pb-10"
         >
-          <div className="bg-white/90 backdrop-blur-md rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl border flex flex-wrap justify-between gap-6 text-center">
+          <div className=" rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl  flex flex-wrap justify-between gap-6 text-center">
               <div className="flex-1 min-w-[120px]">
-                <div className="text-3xl sm:text-4xl font-black text-primary">$1M</div>
-                <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">Investment Prize</div>
+                <div className="text-3xl sm:text-4xl font-black text-white">$1M</div>
+                <div className="text-xs font-bold text-white uppercase tracking-widest mt-1">Investment Prize</div>
               </div>
               <div className="flex-1 min-w-[120px]">
-                <div className="text-3xl sm:text-4xl font-black text-primary">50K+</div>
-                <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">Attendees</div>
+                <div className="text-3xl sm:text-4xl font-black text-white">50K+</div>
+                <div className="text-xs font-bold text-white uppercase tracking-widest mt-1">Attendees</div>
               </div>
               <div className="flex-1 min-w-[120px]">
-                <div className="text-3xl sm:text-4xl font-black text-primary">2.5K+</div>
-                <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">Investors</div>
+                <div className="text-3xl sm:text-4xl font-black text-white">2.5K+</div>
+                <div className="text-xs font-bold text-white uppercase tracking-widest mt-1">Investors</div>
               </div>
               <div className="flex-1 min-w-[120px]">
-                <div className="text-3xl sm:text-4xl font-black text-primary">100+</div>
-                <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">Regionals</div>
+                <div className="text-3xl sm:text-4xl font-black text-white">100+</div>
+                <div className="text-xs font-bold text-white uppercase tracking-widest mt-1">Regionals</div>
               </div>
           </div>
         </motion.div>
@@ -85,9 +85,9 @@ export default function StartupWorldCupPage() {
                 World's Largest Startup Competition
               </h2>
               <div className="flex items-center justify-center gap-4">
-                <div className="h-1 w-12 bg-accent rounded-full" />
-                <span className="text-2xl font-bold text-accent">$1 Million Cash Prize</span>
-                <div className="h-1 w-12 bg-accent rounded-full" />
+                <div className="h-1 w-12 bg-primary rounded-full" />
+                <span className="text-2xl font-bold text-primary">$1 Million Cash Prize</span>
+                <div className="h-1 w-12 bg-primary rounded-full" />
               </div>
             </div>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-8 md:gap-12 w-full max-w-4xl mx-auto rounded-3xl bg-white/80 backdrop-blur-sm p-10 sm:p-12 shadow-xl border">
@@ -177,13 +177,13 @@ export default function StartupWorldCupPage() {
             ].map((item, idx) => (
               <motion.div
                 key={idx}
-                initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
+                initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className={`relative flex items-center gap-12 ${idx % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}
+                className={`relative flex items-center gap-12`}
               >
                 <div className="w-1/2 text-right">
-                  <div className={`text-2xl font-black ${idx % 2 === 0 ? 'text-right' : 'text-left'} ${item.active ? 'text-accent' : 'text-zinc-900'}`}>
+                  <div className={`text-2xl font-black text-right ${item.active ? 'text-accent' : 'text-zinc-900'}`}>
                     {item.label}
                   </div>
                 </div>
@@ -193,7 +193,7 @@ export default function StartupWorldCupPage() {
                 </div>
 
                 <div className="w-1/2">
-                  <div className={`text-xl font-bold ${idx % 2 === 0 ? 'text-left' : 'text-right'} text-zinc-500`}>
+                  <div className={`text-xl font-bold  text-left font-bold text-cyan-700 `}>
                     {item.date}
                   </div>
                 </div>

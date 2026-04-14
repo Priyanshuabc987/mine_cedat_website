@@ -10,7 +10,7 @@ export default function GalleryPage() {
     <div className="min-h-screen bg-background pt-32 pb-20">
       <div className="container mx-auto px-4 text-center mb-16">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6">
-          Community <span className="text-accent italic">Moments</span>
+          Community <span className="text-primary italic">Moments</span>
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
           Capturing the energy of innovation. See what happens when the ecosystem unites across workshops, pitches, and conferences.

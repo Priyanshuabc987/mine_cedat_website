@@ -48,7 +48,7 @@ export function Navbar() {
     <nav className={cn(
       "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
       isSolid 
-        ? "bg-white/95 backdrop-blur-md border-b border-border/40 h-20  shadow-sm" 
+        ? "bg-white/95 backdrop-blur-md  border-border/40 h-20  shadow-sm" 
         : "bg-transparent h-20 "
     )}>
       <div className="container mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
@@ -63,14 +63,14 @@ export function Navbar() {
           {navLinks.map((link) => (
             <Link key={link.href} href={link.href}>
               <span className={cn(
-                "text-sm font-bold transition-all hover:text-accent cursor-pointer relative group/link",
+                "text-sm font-bold transition-all hover:text-primary cursor-pointer relative group/link",
                 pathname === link.href
-                  ? (isSolid ? "text-primary" : "text-accent")
+                  ? (isSolid ? "text-primary" : "text-primary")
                   : (isSolid ? "text-muted-foreground" : "text-white/90")
               )}>
                 {link.label}
                 <span className={cn(
-                  "absolute -bottom-1 left-0 h-0.5 bg-accent transition-all duration-300",
+                  "absolute -bottom-1 left-0 h-0.5 bg-primary transition-all duration-300",
                   pathname === link.href ? "w-full" : "w-0 group-hover/link:w-full"
                 )} />
               </span>
@@ -135,7 +135,7 @@ export function Navbar() {
             </div>
           ) : (
             <Link href="/login">
-              <Button className="rounded-full px-6 bg-accent hover:bg-accent/90 text-white font-bold shadow-lg shadow-accent/20">
+              <Button className="rounded-full px-6 bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20">
                 Join Community
               </Button>
             </Link>
@@ -156,7 +156,7 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-background border-b border-border/40 p-6 flex flex-col gap-4 animate-in slide-in-from-top-5 shadow-2xl">
+        <div className="md:hidden absolute top-full left-0 right-0 bg-background  border-border/40 p-6 flex flex-col gap-4 animate-in slide-in-from-top-5 shadow-2xl">
           {navLinks.map((link) => (
             <Link key={link.href} href={link.href} onClick={() => setIsMobileMenuOpen(false)}>
               <span className={cn(

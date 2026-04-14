@@ -51,22 +51,24 @@ export function EventCard({ event }: EventCardProps) {
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-accent/10 to-accent/5 flex items-center justify-center">
+              <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
                 <Calendar className="w-12 h-12 text-muted-foreground" />
               </div>
             )}
 
             <div className="absolute top-2 sm:top-4 left-2 sm:left-4 z-20">
               <Badge
-                variant={isPast ? 'secondary' : 'default'}
-                className="text-[10px] sm:text-xs whitespace-nowrap w-fit shadow-md"
+                className={`text-[10px] sm:text-xs whitespace-nowrap w-fit shadow-md border-none ${isPast
+                    ? 'bg-red-600 text-white hover:bg-red-700'
+                    : 'bg-primary text-white hover:bg-primary/90'
+                  }`}
               >
-                {isPast ? 'Registration Closed' : 'Registration Open'}
+                {isPast ? 'Ended' : 'Upcoming'}
               </Badge>
             </div>
 
             <div className="absolute top-2 sm:top-4 right-2 sm:right-4 z-20 bg-background/90 backdrop-blur text-foreground px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold whitespace-nowrap">
-               {dateInfo.month} {dateInfo.day}
+              {dateInfo.month} {dateInfo.day}
             </div>
           </div>
 
@@ -76,8 +78,8 @@ export function EventCard({ event }: EventCardProps) {
                 <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
                 <span className="truncate">{dateInfo.full}</span>
               </span>
-               <span className="hidden sm:inline text-muted-foreground/50">•</span>
-               <span className="flex items-center gap-1.5 min-w-0">
+              <span className="hidden sm:inline text-muted-foreground/50">•</span>
+              <span className="flex items-center gap-1.5 min-w-0">
                 <Clock className="w-3.5 h-3.5 flex-shrink-0" />
                 <span className="truncate">{dateInfo.time}</span>
               </span>
@@ -92,21 +94,33 @@ export function EventCard({ event }: EventCardProps) {
               )}
             </div>
 
-            <h3 className="text-lg sm:text-xl font-display font-bold group-hover:text-accent transition-colors line-clamp-2 leading-snug">
+            <h3 className="text-lg sm:text-xl font-display font-bold group-hover:text-primary transition-colors line-clamp-2 leading-snug">
               {event.title}
             </h3>
-            
+
             {event.description && (
               <p className="text-sm text-muted-foreground mt-2 line-clamp-3">
                 {event.description}
               </p>
             )}
-            
-            <div className="mt-auto pt-4 text-right">
-                <p className="text-sm font-semibold text-accent group-hover:underline">
-                  Register Now →
-                </p>
-            </div>
+
+<div className="mt-auto pt-4 text-right">
+  <p 
+    className={`inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-full border-2 transition-all 
+      ${isPast 
+        ? 'bg-zinc-100 border-zinc-200 text-zinc-400 cursor-not-allowed opacity-70' 
+        : 'bg-black border-slate-200 text-white group-hover:bg-primary group-hover:border-primary group-hover:underline'
+      }`}
+  >
+    {isPast ? (
+      <>Registration Closed <span className="ml-1">✕</span></>
+    ) : (
+      <>Register Now <span className="ml-1">→</span></>
+    )}
+  </p>
+</div>
+
+
           </div>
         </Card>
       </Link>

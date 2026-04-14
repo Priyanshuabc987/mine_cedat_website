@@ -1,6 +1,6 @@
 
 import Link from "next/link";
-import { Linkedin, Facebook, Instagram, Youtube } from "lucide-react";
+import { Linkedin, Instagram, Youtube } from "lucide-react";
 
 export function Footer() {
   return (
@@ -27,27 +27,27 @@ export function Footer() {
               <h4 className="text-white font-bold text-sm uppercase tracking-widest">Programs</h4>
               <ul className="space-y-2 text-sm text-zinc-400">
                 <li><Link href="/startup-world-cup" className="hover:text-white transition-colors">Startup World Cup</Link></li>
-                <li><Link href="/fic" className="hover:text-white transition-colors">FIC</Link></li>
+                {/* <li><Link href="/fic" className="hover:text-white transition-colors">FIC</Link></li> */}
                 <li><Link href="/ask-us" className="hover:text-white transition-colors">Support</Link></li>
               </ul>
             </div>
             <div className="space-y-4">
               <h4 className="text-white font-bold text-sm uppercase tracking-widest">Connect</h4>
               <div className="flex gap-4">
-                <a href="#" className="text-zinc-400 hover:text-white transition-colors"><Linkedin className="w-5 h-5" /></a>
-                <a href="#" className="text-zinc-400 hover:text-white transition-colors"><Facebook className="w-5 h-5" /></a>
-                <a href="#" className="text-zinc-400 hover:text-white transition-colors"><Instagram className="w-5 h-5" /></a>
+                <a href="https://www.linkedin.com/company/cedatnexus" target="_blank" rel="noopener noreferrer"  className="text-zinc-400 hover:text-white transition-colors"><Linkedin className="w-5 h-5" /></a>
+                <a href="https://www.youtube.com/channel/UCmY3PX-DZdvnaOOp8uSHheA" target="_blank" rel="noopener noreferrer"  className="text-zinc-400 hover:text-white transition-colors"><Youtube className="w-5 h-5" /></a>
+                <a href="https://www.instagram.com/c_e_d_a_t/" target="_blank" rel="noopener noreferrer"  className="text-zinc-400 hover:text-white transition-colors"><Instagram className="w-5 h-5" /></a>
               </div>
             </div>
           </nav>
         </div>
 
-        <div className="border-t border-zinc-800 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-zinc-500">
+        <div className="border-t border-zinc-800 mt-12 pt-8 flex flex-col sm:flex-row justify-around items-center gap-4 text-xs text-zinc-500">
           <p>© {new Date().getFullYear()} CEDAT Startup Ecosystem. All rights reserved.</p>
-          <div className="flex gap-6">
+          {/* <div className="flex gap-6">
             <Link href="/privacy" className="hover:text-zinc-300">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-zinc-300">Terms of Service</Link>
-          </div>
+          </div> */}
         </div>
       </div>
     </footer>

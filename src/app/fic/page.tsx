@@ -152,7 +152,6 @@ export default function FICPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }
