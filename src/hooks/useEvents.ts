@@ -30,14 +30,26 @@ export function useEvents(params: any = {}) {
         {
           id: '1',
           title: 'FIC Flagship Summit 2024',
-          event_date: new Date(Date.now() + 86400000 * 10).toISOString(),
+          event_date: '2026-04-25T10:00:00Z',
           location: 'Innovation Hub, Bengaluru',
           status: 'published',
           is_featured: true,
           category: 'FIC',
           calculated_state: 'registration_open',
           featured_image_url: 'https://picsum.photos/seed/fic/800/800',
-          description: 'The ultimate gathering for founders and investors.'
+          description: 'Building a startup? Or already running one? Come join us at Namma Bengaluru Startups Meetup – a chill and meaningful gathering for Startup Founders, Co-Founders, Entrepreneurs in bengluru '
+        },
+        {
+          id: '2',
+          title: 'Namma Bengaluru Startups Meetup by CEDAT',
+          event_date: '2026-04-12T10:00:00Z',
+          location: 'Innovation Hub, Bengaluru',
+          status: 'published',
+          is_featured: true,
+          category: 'FIC',
+          calculated_state: 'registration_open',
+          featured_image_url: 'https://picsum.photos/seed/fic/800/800',
+          description: 'Building a startup? Or already running one? Come join us at Namma Bengaluru Startups Meetup – a chill and meaningful gathering for Startup Founders, Co-Founders, Entrepreneurs'
         }
       ],
       total: 1
@@ -58,7 +70,7 @@ export function useFICEvent() {
     queryFn: async () => ({
       id: 'fic-1',
       title: 'Founders Innovation Circle (FIC)',
-      event_date: new Date(Date.now() + 86400000 * 30).toISOString(),
+      event_date: '2026-04-24T10:00:00Z',
       location: 'The Nexus, MG Road',
       status: 'published',
       is_featured: true,

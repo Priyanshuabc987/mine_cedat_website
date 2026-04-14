@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect } from 'react';
 import { EventCard } from './EventCard';
 import { Button } from '@/components/ui/button';
@@ -9,21 +10,17 @@ import { eventsAPI } from '@/lib/api';
 interface EventListProps {
   statusFilter?: string;
   showStatusFilter?: boolean;
-  showRegistrationButtons?: boolean;
-  onRegister?: (eventId: string) => void;
-  registeredEventIds?: string[];
   className?: string;
+  limit?: number; // Add a limit for the number of events to show
 }
 
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 9; // Changed to 9 for better grid layout (3x3)
 
 export function EventList({
   statusFilter,
   showStatusFilter = false,
-  showRegistrationButtons = false,
-  onRegister,
-  registeredEventIds = [],
-  className = ""
+  className = "",
+  limit
 }: EventListProps) {
   const ALL_VALUE = '__all__';
   const [page, setPage] = useState(1);
@@ -37,18 +34,17 @@ export function EventList({
   const { data, isLoading, error } = useEvents({
     status_filter: statusFilterParam,
     page: 1,
-    page_size: PAGE_SIZE,
+    page_size: limit || PAGE_SIZE, // Use limit if provided, otherwise use page size
   });
 
   const eventsData = data as EventListResponse | undefined;
 
-  // Sync initial data when first page loads
   useEffect(() => {
-    if (eventsData?.items && page === 1) {
-      setAllEvents(eventsData.items);
-      setTotal(eventsData.total);
+    if (eventsData?.items) {
+        setAllEvents(eventsData.items);
+        setTotal(eventsData.total);
     }
-  }, [eventsData?.items, eventsData?.total, page]);
+  }, [eventsData?.items, eventsData?.total]);
 
   const handleStatusFilterChange = (value: string) => {
     setSelectedStatusFilter(value);
@@ -58,6 +54,8 @@ export function EventList({
   };
 
   const loadMore = useCallback(async () => {
+    if (limit) return; // Don't load more if a limit is set
+
     const nextPage = page + 1;
     setIsLoadingMore(true);
     try {
@@ -71,59 +69,52 @@ export function EventList({
       setPage(nextPage);
       setTotal(json.total);
     } catch {
-      // Error handled by UI
+      // Error is handled by the main error state
     } finally {
       setIsLoadingMore(false);
     }
-  }, [page, statusFilterParam]);
-
-  const displayedEvents = allEvents.length > 0 ? allEvents : (eventsData?.items ?? []);
+  }, [page, statusFilterParam, limit]);
 
   // Sort so that upcoming events (closest future date) appear first,
-  // and completed/past events are pushed to the end.
-  const sortedEvents = [...displayedEvents].sort((a, b) => {
+  const sortedEvents = [...allEvents].sort((a, b) => {
     const now = new Date();
     const aDate = new Date(a.event_date);
     const bDate = new Date(b.event_date);
 
-    const aPast =
-      a.calculated_state === 'concluded' ||
-      a.calculated_state === 'cancelled' ||
-      aDate.getTime() < now.getTime();
-    const bPast =
-      b.calculated_state === 'concluded' ||
-      b.calculated_state === 'cancelled' ||
-      bDate.getTime() < now.getTime();
+    const aIsPast = aDate.getTime() < now.getTime() || a.calculated_state === 'concluded' || a.calculated_state === 'cancelled';
+    const bIsPast = bDate.getTime() < now.getTime() || b.calculated_state === 'concluded' || b.calculated_state === 'cancelled';
 
-    if (aPast !== bPast) {
-      // Upcoming first, past last
-      return aPast ? 1 : -1;
+    if (aIsPast !== bIsPast) {
+      return aIsPast ? 1 : -1; // Upcoming events first
     }
-
-    // Within each group, sort by date ascending (nearest first)
-    return aDate.getTime() - bDate.getTime();
+    
+    // For events in the same category (both past or both upcoming), sort by date
+    if (aIsPast) {
+      return bDate.getTime() - aDate.getTime(); // Most recent past events first
+    } else {
+      return aDate.getTime() - bDate.getTime(); // Nearest upcoming events first
+    }
   });
 
-  const displayTotal = allEvents.length > 0 ? total : (eventsData?.total ?? 0);
-  const hasMore = displayTotal > sortedEvents.length;
+  const hasMore = total > sortedEvents.length && !limit; // No "Show More" if limit is set
 
-  if (isLoading && displayedEvents.length === 0) {
+  if (isLoading && sortedEvents.length === 0) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
-  if (error && displayedEvents.length === 0) {
+  if (error && sortedEvents.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-destructive">Failed to load events. Please try again.</p>
+        <p className="text-destructive">Failed to load events. Please try again later.</p>
       </div>
     );
   }
 
-  if (!displayedEvents.length && !isLoading) {
+  if (sortedEvents.length === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground">No events found.</p>
@@ -133,11 +124,10 @@ export function EventList({
 
   return (
     <div className={className}>
-      {/* Status Filter */}
       {showStatusFilter && (
         <div className="mb-4 sm:mb-6">
           <Select value={selectedStatusFilter} onValueChange={handleStatusFilterChange}>
-            <SelectTrigger className="w-full sm:w-48 min-h-[44px]">
+            <SelectTrigger className="w-full sm:w-48 min-h-[44px] rounded-full">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
@@ -150,20 +140,12 @@ export function EventList({
         </div>
       )}
 
-      {/* Events Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8 items-stretch">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8 items-stretch">
         {sortedEvents.map((event) => (
-          <EventCard
-            key={event.id}
-            event={event}
-            showRegistrationButton={showRegistrationButtons}
-            onRegister={() => onRegister?.(event.id)}
-            isRegistered={registeredEventIds.includes(event.id)}
-          />
+          <EventCard key={event.id} event={event} />
         ))}
       </div>
 
-      {/* Show More Button */}
       {hasMore && (
         <div className="flex justify-center">
           <Button

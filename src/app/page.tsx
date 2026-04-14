@@ -4,21 +4,11 @@
 import { Hero } from "@/components/home/Hero";
 import { SocialFeed } from "@/components/home/SocialFeed";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, MapPin, Loader2, ChevronRight, Zap, Target, Rocket, Users } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { useEvents } from "@/hooks/useEvents";
-import { format } from 'date-fns';
-import { ImageWithFallback } from '@/components/ui/image-with-fallback';
-import { Card, CardContent } from "@/components/ui/card";
+import { EventList } from "@/components/events/EventList";
 
 export default function Home() {
-  const { data: eventsData, isLoading, error } = useEvents({
-    status_filter: 'published',
-    page_size: 6,
-  });
-
-  const events = eventsData?.items || [];
-
   return (
     <div className="min-h-screen bg-background">
       <Hero />
@@ -46,11 +36,11 @@ export default function Home() {
       </section>
 
       {/* Events Grid */}
-      <section className="py-24 container mx-auto px-4 sm:px-6">
+      <section className="py-24 pb-10 container mx-auto px-4 sm:px-6">
         <div className="flex flex-col md:flex-row justify-between items-start mb-12 gap-6">
           <div className="space-y-4">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-foreground">
-              Startup Ecosystem <span className="text-accent italic">Meetups</span>
+              Startup <span className="text-accent italic">Meetups & Events</span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-xl">
               Connecting startups and innovators into one powerful network.
@@ -63,50 +53,14 @@ export default function Home() {
           </Link>
         </div>
 
-        {isLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-10 h-10 animate-spin text-primary" />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {events.map((event) => (
-              <Card key={event.id} className="group overflow-hidden rounded-3xl border-none shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-2">
-                <div className="aspect-[4/3] relative overflow-hidden bg-muted">
-                  <ImageWithFallback
-                    src={event.featured_image_url || ''}
-                    alt={event.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute top-4 left-4">
-                    <div className="bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-primary shadow-sm">
-                      Upcoming
-                    </div>
-                  </div>
-                </div>
-                <CardContent className="p-6 md:p-8 space-y-4">
-                  <div className="flex flex-wrap gap-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                    <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {format(new Date(event.event_date), 'MMM dd')}</span>
-                    <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {event.location || 'Bengaluru'}</span>
-                  </div>
-                  <h3 className="text-xl md:text-2xl font-black group-hover:text-primary transition-colors leading-tight">
-                    {event.title}
-                  </h3>
-                  <Link href={`/events/${event.id}`}>
-                    <Button variant="link" className="p-0 h-auto font-black text-accent hover:text-accent/80 mt-2">
-                      REGISTER NOW <ChevronRight className="ml-1 w-4 h-4" />
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+        <EventList statusFilter="published" limit={3} />
+        
       </section>
 
       <SocialFeed />
 
       {/* Programs Teaser */}
-      <section className="py-24 bg-primary text-white overflow-hidden relative">
+      <section className="py-24 pb-10 bg-primary text-white overflow-hidden relative">
         <div className="absolute top-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl space-y-8">

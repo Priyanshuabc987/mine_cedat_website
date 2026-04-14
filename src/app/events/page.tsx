@@ -20,14 +20,15 @@ export default function EventsPage() {
 
           <div className="max-w-4xl mb-16 space-y-4">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-foreground">
-              Startup Ecosystem <span className="text-accent italic">Meetups & Events</span>
+              Startup <span className="text-accent italic">Meetups & Events</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl">
-              Connecting startups, students, and innovators into one powerful network. Discover workshops, summits, and networking nights.
+              Connecting startups, students, and innovators into one powerful network. 
             </p>
           </div>
 
-          <EventList />
+          <EventList statusFilter="published"  />
+
         </div>
       </main>
     </div>

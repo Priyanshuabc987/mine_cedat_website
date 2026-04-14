@@ -31,7 +31,7 @@ export function SocialFeed() {
 
   if (isLoading) {
     return (
-      <section className="py-16 sm:py-20 md:py-24 bg-background">
+      <section className="pb-16 md:pb-24 bg-background">
         <div className="container mx-auto px-4 sm:px-6 md:px-8">
           <div className="flex items-center justify-center">
             <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
@@ -46,14 +46,14 @@ export function SocialFeed() {
   }
 
   return (
-    <section className="py-16 sm:py-20 md:py-24 bg-background">
+    <section className="pb-16 md:pb-24 bg-background">
       <div className="container mx-auto px-4 sm:px-6 md:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="mb-12 sm:mb-16"
+          className="mb-8 sm:mb-10"
         >
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold mb-2 sm:mb-4">
             Follow Us
@@ -121,7 +121,7 @@ function SocialRow({
                     width="100%"
                     frameBorder="0"
                     scrolling="no"
-                    allowtransparency="true"
+                    // allowtransparency="true"
                     title="Embedded Instagram post"
                     style={{ maxWidth: "100%", backgroundColor: "#fff" }}
                   />
