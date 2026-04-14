@@ -38,7 +38,7 @@ export function Navbar() {
   return (
     <nav className={cn(
       "fixed top-0 z-50 w-full transition-all duration-300",
-      scrolled ? "bg-white/90 backdrop-blur-lg shadow-sm border-b h-20" : "bg-transparent h-24"
+      scrolled ? "bg-white/90 backdrop-blur-lg shadow-sm border-b h-16" : "bg-transparent h-16"
     )}>
       <div className="container mx-auto flex h-full items-center justify-between px-4">
         <Link href="/" className="flex items-center space-x-2 group">

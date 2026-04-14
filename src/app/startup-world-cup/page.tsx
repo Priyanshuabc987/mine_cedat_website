@@ -3,74 +3,84 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, Rocket, Shield, Users, Trophy, Globe, Zap, ArrowRight, CheckCircle2 } from "lucide-react";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
+import { Calendar, MapPin, Users, Mic2,Zap } from "lucide-react";
+import Link from "next/link";
 
 const SWC_LOGO_SRC = "https://static.wixstatic.com/media/9a1d63_ab519186f938416c8846e0010be6186d~mv2_d_2001_2457_s_2.png";
-const swccedatImage = "https://picsum.photos/seed/cedat/400/200";
 
 export default function StartupWorldCupPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-zinc-900 pt-24">
-        <div className="absolute inset-0 z-0">
-          <div className="w-full h-full bg-gradient-to-br from-cyan-900/40 via-black to-black" />
-          <div className="absolute inset-0 opacity-20 bg-[url('https://picsum.photos/seed/swcbg/1920/1080')] bg-cover bg-center" />
+    <div className="min-h-screen bg-white text-foreground font-sans">
+
+      {/* Hero Section with Video and Stats */}
+      <section className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden pt-20 sm:pt-24">
+        <video
+          src="/startupworldcup/SWC hero video.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover z-0"
+        />
+        <div className="absolute inset-0 bg-black/50 z-10" aria-hidden="true" />
+        
+        <div className="relative z-20 text-center px-4 pt-16 pb-8 flex-grow flex flex-col justify-center items-center">
+            {/* <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="text-4xl sm:text-6xl md:text-7xl font-black text-white leading-tight tracking-tighter max-w-4xl"
+            >
+              Startup World Cup
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+              className="mt-4 text-lg sm:text-xl md:text-2xl font-bold text-accent max-w-2xl mx-auto"
+            >
+              Bangalore Regional
+            </motion.p> */}
         </div>
-        <div className="container mx-auto px-4 relative z-10 text-center space-y-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-block bg-accent/20 backdrop-blur-md border border-accent/30 text-accent px-6 py-2 rounded-full text-sm font-black uppercase tracking-widest"
-          >
-            World's Largest Startup Competition
-          </motion.div>
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-5xl sm:text-7xl md:text-8xl font-black text-white leading-tight tracking-tighter"
-          >
-            Bangalore <span className="text-accent italic">Regional</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-xl text-zinc-400 max-w-2xl mx-auto font-medium leading-relaxed"
-          >
-            Hosted by <span className="text-white font-bold">CEDAT</span>. Win a chance to represent India at the global finals in San Francisco for a <span className="text-accent font-bold">$1 Million investment prize</span>.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="flex flex-wrap justify-center gap-4 pt-4"
-          >
-            <Button size="lg" className="rounded-full bg-accent hover:bg-accent/90 text-white font-black px-10 h-16 text-lg group">
-              Apply to Pitch <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button size="lg" variant="outline" className="rounded-full border-white text-white hover:bg-white/10 px-10 h-16 text-lg">
-              Register to Attend
-            </Button>
-          </motion.div>
-        </div>
+
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
+          className="relative z-20 w-full container mx-auto px-4 sm:px-6 pb-10"
+        >
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl border flex flex-wrap justify-between gap-6 text-center">
+              <div className="flex-1 min-w-[120px]">
+                <div className="text-3xl sm:text-4xl font-black text-primary">$1M</div>
+                <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">Investment Prize</div>
+              </div>
+              <div className="flex-1 min-w-[120px]">
+                <div className="text-3xl sm:text-4xl font-black text-primary">50K+</div>
+                <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">Attendees</div>
+              </div>
+              <div className="flex-1 min-w-[120px]">
+                <div className="text-3xl sm:text-4xl font-black text-primary">2.5K+</div>
+                <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">Investors</div>
+              </div>
+              <div className="flex-1 min-w-[120px]">
+                <div className="text-3xl sm:text-4xl font-black text-primary">100+</div>
+                <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">Regionals</div>
+              </div>
+          </div>
+        </motion.div>
       </section>
 
-      {/* Partnership Section */}
-      <section className="py-24 bg-gradient-to-b from-slate-100 to-white">
+      {/* Logo & Partnership Section */}
+      <section className="py-16 sm:py-24 bg-gradient-to-b from-slate-50 to-cyan-50/50 border-b border-slate-200/60">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="flex flex-col items-center text-center space-y-12"
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="flex flex-col items-center text-center space-y-10"
           >
-            <div className="space-y-4">
+<div className="space-y-4">
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-zinc-900">
                 World's Largest Startup Competition
               </h2>
@@ -80,44 +90,82 @@ export default function StartupWorldCupPage() {
                 <div className="h-1 w-12 bg-accent rounded-full" />
               </div>
             </div>
-
-            <div className="flex flex-col md:flex-row items-center justify-between gap-12 w-full max-w-5xl mx-auto rounded-[3rem] bg-white border border-slate-200 shadow-2xl p-12">
-              <div className="rounded-2xl bg-zinc-900 aspect-square w-48 flex items-center justify-center p-6 shadow-xl">
-                <img src={SWC_LOGO_SRC} alt="Startup World Cup" className="max-h-full max-w-full object-contain" />
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-8 md:gap-12 w-full max-w-4xl mx-auto rounded-3xl bg-white/80 backdrop-blur-sm p-10 sm:p-12 shadow-xl border">
+              <div className="rounded-xl bg-primary aspect-square w-32 sm:w-44 flex items-center justify-center shrink-0 p-3">
+                <img
+                  src={SWC_LOGO_SRC}
+                  alt="Startup World Cup"
+                  className="max-w-full object-contain drop-shadow-md"
+                />
               </div>
-              
-              <div className="flex flex-col items-center gap-4">
-                <span className="text-lg font-black uppercase tracking-widest text-zinc-400">In Partnership With</span>
-                <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center text-accent">
-                  <CheckCircle2 className="w-10 h-10" />
-                </div>
+              <div className="text-xl font-bold text-primary tracking-widest uppercase">
+                In Partnership With
               </div>
-
-              <div className="space-y-4 text-center">
-                <img src={swccedatImage} alt="CEDAT" className="h-32 w-auto object-contain mx-auto" />
-                <p className="text-xl font-black italic text-zinc-900 tracking-tighter">THE HOST</p>
-              </div>
+              <img
+                src="/startupworldcup/swccedat.png"
+                alt="CEDAT"
+                className="h-28 sm:h-36 w-auto object-contain shrink-0"
+              />
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Timeline Section */}
-      <section className="py-24 container mx-auto px-4 bg-zinc-50 rounded-[4rem] my-12">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 mb-16 pb-8 border-b">
-            <div className="flex items-center gap-4">
-              <MapPin className="w-10 h-10 text-accent" />
-              <span className="text-2xl font-black text-zinc-900">Bangalore, India</span>
+      {/* Intro & Timeline Section */}
+      <section className="py-16 sm:py-24 bg-white">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="flex flex-col items-center text-center space-y-8"
+          >
+            <p className="text-primary font-medium uppercase tracking-[0.2em]">
+              Regional Competition
+            </p>
+            <h2 className="text-4xl sm:text-6xl font-display font-bold tracking-tight text-gray-900">
+              Bangalore Regional
+            </h2>
+            <p className="text-xl font-bold text-primary max-w-2xl mx-auto">
+              Hosted by CEDAT
+            </p>
+            <img
+              src="/startupworldcup/SWC1.png"
+              alt="Startup World Cup Bangalore Regional"
+              className="w-full max-w-3xl mx-auto rounded-2xl object-contain shadow-xl border"
+            />
+            <p className="text-lg text-gray-600 max-w-xl italic">
+              “This platform is for startups and startup ecosystems of the world.”
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link href="https://www.startupworldcup.io/bangalore-2026" target="_blank">
+                <Button size="lg" className="rounded-full font-semibold px-8 py-6 text-base shadow-md">
+                  Register to Pitch
+                </Button>
+              </Link>
+              <Link href="https://luma.com/dhftdjzm" target="_blank">
+                <Button variant="outline" size="lg" className="rounded-full font-semibold px-8 py-6 text-base shadow-sm">
+                  Register to Attend
+                </Button>
+              </Link>
             </div>
-            <div className="hidden sm:block w-px h-12 bg-zinc-200" />
-            <div className="flex items-center gap-4">
-              <Calendar className="w-10 h-10 text-accent" />
-              <span className="text-2xl font-black text-zinc-900">Regional Host</span>
-            </div>
-          </div>
 
-          <div className="relative space-y-12">
+            <div className="w-full max-w-4xl mx-auto pt-16">
+              <div className="bg-white rounded-3xl p-8 sm:p-12 border shadow-xl">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-8 mb-12 pb-8 border-b">
+                  <div className="flex items-center gap-4">
+                    <MapPin className="w-10 h-10 text-primary" />
+                    <span className="text-2xl font-bold text-gray-900">Bangalore, India</span>
+                  </div>
+                  <div className="hidden sm:block w-px h-12 bg-gray-300"></div>
+                  <div className="flex items-center gap-4">
+                    <img src="/startupworldcup/swccedat.png" alt="CEDAT" className="h-16 w-auto object-contain" />
+                    <span className="text-lg text-gray-700 font-semibold">Host</span>
+                  </div>
+                </div>
+                
+                <div className="relative space-y-12">
             <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-zinc-200 -translate-x-1/2" aria-hidden="true" />
             
             {[
@@ -153,36 +201,109 @@ export default function StartupWorldCupPage() {
             ))}
           </div>
         </div>
+            </div>
+          </motion.div>
+        </div>
       </section>
 
-      {/* Benefits */}
-      <section className="py-24 container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-          <div className="space-y-6 text-center group hover:-translate-y-2 transition-transform">
-            <div className="w-20 h-20 bg-accent/10 rounded-3xl flex items-center justify-center mx-auto text-accent group-hover:bg-accent group-hover:text-white transition-colors">
-              <Rocket className="w-10 h-10" />
+      {/* Why Attend Section */}
+      <section className="py-16 sm:py-24 bg-slate-50 border-y">
+        <div className="container mx-auto px-4">
+          <h2 className="text-4xl font-display font-bold text-center mb-12 text-gray-900">Why Attend?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            <div className="order-2 md:order-1 rounded-2xl p-8 bg-gradient-to-br from-cyan-50 to-sky-100 border flex flex-col justify-center">
+              <h3 className="text-xl font-display font-bold text-primary mb-3 uppercase tracking-wide">For Startups</h3>
+              <ul className="space-y-2 text-gray-800 list-disc list-inside">
+                <li>Network with top tier investors.</li>
+                <li>Develop corporate partnerships and hear from top industry experts.</li>
+              </ul>
             </div>
-            <h3 className="text-2xl font-black">For Startups</h3>
-            <p className="text-zinc-500 leading-relaxed">Network with top-tier global investors, refine your pitch, and secure development partnerships.</p>
-          </div>
-          <div className="space-y-6 text-center group hover:-translate-y-2 transition-transform">
-            <div className="w-20 h-20 bg-accent/10 rounded-3xl flex items-center justify-center mx-auto text-accent group-hover:bg-accent group-hover:text-white transition-colors">
-              <Shield className="w-10 h-10" />
+            <div className="order-1 md:order-2 rounded-2xl overflow-hidden shadow-lg aspect-video">
+              <img src="/startupworldcup/SWC2.png" alt="Startups at SWC" className="w-full h-full object-cover" />
             </div>
-            <h3 className="text-2xl font-black">For Corporates</h3>
-            <p className="text-zinc-500 leading-relaxed">Discover innovative tech solutions and explore M&A opportunities with vetted startup founders.</p>
-          </div>
-          <div className="space-y-6 text-center group hover:-translate-y-2 transition-transform">
-            <div className="w-20 h-20 bg-accent/10 rounded-3xl flex items-center justify-center mx-auto text-accent group-hover:bg-accent group-hover:text-white transition-colors">
-              <Users className="w-10 h-10" />
+            <div className="order-3 rounded-2xl p-8 bg-gradient-to-br from-cyan-50 to-sky-100 border flex flex-col justify-center">
+              <h3 className="text-xl font-display font-bold text-primary mb-3 uppercase tracking-wide">For Corporations</h3>
+              <ul className="space-y-2 text-gray-800 list-disc list-inside">
+                <li>Meet innovative startups from around the world.</li>
+                <li>Originate business development opportunities.</li>
+                <li>Network with other corporate representatives and investors.</li>
+              </ul>
             </div>
-            <h3 className="text-2xl font-black">For Investors</h3>
-            <p className="text-zinc-500 leading-relaxed">Expand your deal pipeline with high-potential startups across various industry tracks.</p>
+            <div className="order-4 rounded-2xl overflow-hidden shadow-lg aspect-video">
+              <img src="/startupworldcup/SWC3.png" alt="Corporations at SWC" className="w-full h-full object-cover" />
+            </div>
+            <div className="order-6 md:order-5 rounded-2xl p-8 bg-gradient-to-br from-cyan-50 to-sky-100 border flex flex-col justify-center">
+              <h3 className="text-xl font-display font-bold text-primary mb-3 uppercase tracking-wide">For Investors</h3>
+              <ul className="space-y-2 text-gray-800 list-disc list-inside">
+                <li>Meet top global startup founders.</li>
+                <li>Expand your deal pipeline and explore new markets.</li>
+                <li>Network with other investors and corporate representatives.</li>
+              </ul>
+            </div>
+            <div className="order-5 md:order-6 rounded-2xl overflow-hidden shadow-lg aspect-video">
+              <img src="/startupworldcup/SWC4.png" alt="Investors at SWC" className="w-full h-full object-cover" />
+            </div>
           </div>
         </div>
       </section>
 
-      <Footer />
+      {/* Speakers & Judges Coming Soon */}
+      <section className="py-16 sm:py-24 container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-display font-bold mb-8 flex items-center justify-center gap-3 text-gray-900">
+                <Mic2 className="w-8 h-8 text-primary" />
+                Speakers
+              </h2>
+              <div className="max-w-md mx-auto bg-slate-50 rounded-2xl p-12 border border-dashed text-center">
+                <p className="text-2xl font-display font-semibold text-gray-600">Coming Soon</p>
+                <p className="text-gray-500 mt-2">Our lineup of world-class speakers will be announced shortly.</p>
+              </div>
+            </div>
+            <div className="text-center">
+              <h2 className="text-3xl font-display font-bold mb-8 flex items-center justify-center gap-3 text-gray-900">
+                <Users className="w-8 h-8 text-primary" />
+                Judges
+              </h2>
+              <div className="max-w-md mx-auto bg-slate-50 rounded-2xl p-12 border border-dashed text-center">
+                <p className="text-2xl font-display font-semibold text-gray-600">Coming Soon</p>
+                <p className="text-gray-500 mt-2">Our panel of esteemed judges will be revealed soon.</p>
+              </div>
+            </div>
+          </div>
+      </section>
+
+
+      {/* Global Sponsors Section */}
+      <section className="py-16 sm:py-24 bg-slate-50 border-y">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-display font-bold text-center mb-10 text-gray-900 uppercase tracking-wide">
+            Our Global Sponsors & Partners
+          </h2>
+          <div className="w-full max-w-6xl mx-auto">
+            <img
+              src="/startupworldcup/Sponser.png"
+              alt="Global Sponsors & Partners"
+              className="w-full h-auto rounded-xl shadow-lg object-contain bg-white p-6"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+       <section className="py-16 sm:py-24">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-display font-bold text-center mb-8 text-gray-900">About Us</h2>
+            <div className="max-w-3xl mx-auto text-center space-y-4 text-gray-700 text-lg">
+              <p>
+                <span className="font-semibold text-primary">Startup World Cup</span> is a global conference and competition that brings together the top startups, VCs, entrepreneurs and world-class tech CEOs.
+              </p>
+              <p>
+                <span className="font-semibold text-primary">CEDAT</span> is proud to host the Bangalore Regional, connecting India's thriving startup ecosystem with the world's largest startup competition.
+              </p>
+            </div>
+          </div>
+        </section>
     </div>
   );
 }
