@@ -25,7 +25,7 @@ export function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      setScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -39,17 +39,23 @@ export function Navbar() {
     { href: "/ask-us", label: "Ask Us" },
   ];
 
+  // Logic for transparent vs solid initial state based on route
+  // Home and SWC pages have background images, others don't.
+  const isTransparentDefault = pathname === "/" || pathname === "/startup-world-cup";
+  const isSolid = scrolled || !isTransparentDefault;
+
   return (
     <nav className={cn(
       "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-      scrolled ? "bg-background/80 backdrop-blur-md border-b border-border/40 h-16 sm:h-20" : "bg-transparent h-20 sm:h-24"
+      isSolid 
+        ? "bg-white/95 backdrop-blur-md border-b border-border/40 h-16 sm:h-20 shadow-sm" 
+        : "bg-transparent h-20 sm:h-24"
     )}>
       <div className="container mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <span className={cn(
-            "text-2xl font-black font-headline tracking-tighter",
-            scrolled ? "text-primary" : "text-white drop-shadow-md"
-          )}>CEDAT</span>
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative w-28 h-18 sm:w-46 sm:h-16 overflow-hidden rounded-xl flex items-center justify-center transition-transform group-hover:scale-105">
+            <img src="/logo/cedat-logo.png" alt="CEDAT" className="w-full h-full object-contain" />
+          </div>
         </Link>
 
         {/* Desktop Nav */}
@@ -57,12 +63,16 @@ export function Navbar() {
           {navLinks.map((link) => (
             <Link key={link.href} href={link.href}>
               <span className={cn(
-                "text-sm font-bold transition-colors hover:text-accent cursor-pointer",
+                "text-sm font-bold transition-all hover:text-accent cursor-pointer relative group/link",
                 pathname === link.href
-                  ? (scrolled ? "text-primary" : "text-accent")
-                  : (scrolled ? "text-muted-foreground" : "text-white/90")
+                  ? (isSolid ? "text-primary" : "text-accent")
+                  : (isSolid ? "text-muted-foreground" : "text-white/90")
               )}>
                 {link.label}
+                <span className={cn(
+                  "absolute -bottom-1 left-0 h-0.5 bg-accent transition-all duration-300",
+                  pathname === link.href ? "w-full" : "w-0 group-hover/link:w-full"
+                )} />
               </span>
             </Link>
           ))}
@@ -74,7 +84,16 @@ export function Navbar() {
             <div className="flex items-center gap-4">
               {user?.is_admin && (
                 <Link href="/admin">
-                  <Button variant="outline" size="sm" className="rounded-full border-white/20 bg-white/10 text-white hover:bg-white/20">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className={cn(
+                      "rounded-full border-2 transition-all font-bold",
+                      isSolid 
+                        ? "border-primary/20 text-primary hover:bg-primary/5" 
+                        : "border-white/20 bg-white/10 text-white hover:bg-white/20"
+                    )}
+                  >
                     <Shield className="w-4 h-4 mr-2" />
                     Admin
                   </Button>
@@ -82,7 +101,15 @@ export function Navbar() {
               )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="rounded-full border-white/20 bg-white/10 text-white hover:bg-white/20">
+                  <Button 
+                    variant="outline" 
+                    className={cn(
+                      "rounded-full border-2 transition-all font-bold",
+                      isSolid 
+                        ? "border-primary/20 text-primary hover:bg-primary/5" 
+                        : "border-white/20 bg-white/10 text-white hover:bg-white/20"
+                    )}
+                  >
                     <User className="w-4 h-4 mr-2" />
                     {user?.full_name.split(' ')[0]}
                   </Button>
@@ -92,14 +119,14 @@ export function Navbar() {
                   <DropdownMenuSeparator />
                   {user?.profile_slug && (
                     <Link href={`/member/${user.profile_slug}`}>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer">
                         <User className="w-4 h-4 mr-2" />
                         View Profile
                       </DropdownMenuItem>
                     </Link>
                   )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => logout()}>
+                  <DropdownMenuItem onClick={() => logout()} className="cursor-pointer text-destructive">
                     <LogOut className="w-4 h-4 mr-2" />
                     Logout
                   </DropdownMenuItem>
@@ -108,7 +135,7 @@ export function Navbar() {
             </div>
           ) : (
             <Link href="/login">
-              <Button className="rounded-full px-6 bg-accent hover:bg-accent/90 text-white font-bold">
+              <Button className="rounded-full px-6 bg-accent hover:bg-accent/90 text-white font-bold shadow-lg shadow-accent/20">
                 Join Community
               </Button>
             </Link>
@@ -118,8 +145,8 @@ export function Navbar() {
         {/* Mobile Toggle */}
         <button
           className={cn(
-            "md:hidden p-2 min-w-[44px] min-h-[44px] flex items-center justify-center",
-            scrolled ? "text-foreground" : "text-white"
+            "md:hidden p-2 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors",
+            isSolid ? "text-foreground" : "text-white"
           )}
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
@@ -129,24 +156,45 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-background border-b border-border/40 p-6 flex flex-col gap-4 animate-in slide-in-from-top-5 shadow-xl">
+        <div className="md:hidden absolute top-full left-0 right-0 bg-background border-b border-border/40 p-6 flex flex-col gap-4 animate-in slide-in-from-top-5 shadow-2xl">
           {navLinks.map((link) => (
             <Link key={link.href} href={link.href} onClick={() => setIsMobileMenuOpen(false)}>
-              <span className="text-lg font-bold text-foreground py-2 block">
+              <span className={cn(
+                "text-lg font-bold py-2 block transition-colors",
+                pathname === link.href ? "text-primary" : "text-foreground"
+              )}>
                 {link.label}
               </span>
             </Link>
           ))}
           <div className="h-px bg-border my-2" />
           {isAuthenticated ? (
-            <Button variant="ghost" className="justify-start px-0" onClick={() => { logout(); setIsMobileMenuOpen(false); }}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
+            <div className="flex flex-col gap-2">
+              {user?.is_admin && (
+                <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="outline" className="w-full justify-start rounded-full h-12">
+                    <Shield className="w-4 h-4 mr-2" /> Admin Dashboard
+                  </Button>
+                </Link>
+              )}
+              <Button 
+                variant="ghost" 
+                className="justify-start px-0 text-destructive h-12" 
+                onClick={() => { logout(); setIsMobileMenuOpen(false); }}
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           ) : (
-            <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-              <Button className="w-full rounded-full">Sign In</Button>
-            </Link>
+            <div className="flex flex-col gap-3">
+              <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                <Button className="w-full rounded-full h-12">Sign In</Button>
+              </Link>
+              <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                <Button variant="outline" className="w-full rounded-full h-12 border-2">Create Account</Button>
+              </Link>
+            </div>
           )}
         </div>
       )}

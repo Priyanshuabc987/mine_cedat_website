@@ -47,13 +47,13 @@ export default function Home() {
 
       {/* Events Grid */}
       <section className="py-24 container mx-auto px-4 sm:px-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
+        <div className="flex flex-col md:flex-row justify-between items-start mb-12 gap-6">
           <div className="space-y-4">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-foreground">
               Startup Ecosystem <span className="text-accent italic">Meetups</span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-xl">
-              Connecting startups, students, and innovators into one powerful network.
+              Connecting startups and innovators into one powerful network.
             </p>
           </div>
           <Link href="/events">
