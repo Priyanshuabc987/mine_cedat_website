@@ -1,12 +1,20 @@
 
-"use client";
-
-import { EventList } from "@/components/events/EventList";
+import { getEvents } from '@/lib/data/events';
+import { EventListClient } from "@/components/events/EventListClient";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
-export default function EventsPage() {
+// This page is now a Server Component, responsible for fetching initial data.
+export default async function EventsPage() {
+  
+  // Fetch the initial batch of published events directly on the server.
+  // This ensures the data is present in the initial HTML for SEO.
+  const initialEvents = await getEvents({
+    status_filter: 'published',
+    page_size: 6 // A reasonable initial page size
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <main className="pt-32 pb-20">
@@ -27,7 +35,11 @@ export default function EventsPage() {
             </p>
           </div>
 
-          <EventList statusFilter="published"  />
+          {/* 
+            The client component receives the server-fetched data as an initial prop.
+            It will then handle all client-side logic, like fetching more events.
+          */}
+          <EventListClient initialEvents={initialEvents} statusFilter="published" />
 
         </div>
       </main>

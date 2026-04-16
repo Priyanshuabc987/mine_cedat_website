@@ -1,102 +1,190 @@
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+"use client";
+
+import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { collection, query, where, orderBy, doc, deleteDoc, updateDoc, addDoc, serverTimestamp, getDocs, limit, startAfter, QueryDocumentSnapshot, QueryConstraint } from 'firebase/firestore';
+import { useMutation, useQueryClient, useInfiniteQuery, QueryFunctionContext } from '@tanstack/react-query';
+import { generateSlug } from '@/lib/utils';
+import { revalidateEventsList, revalidateEventDetail } from '@/lib/actions/revalidate';
+
+async function uploadToCloudinary(file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
+
+  const response = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!}/image/upload`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error('Cloudinary upload failed:', errorData);
+    throw new Error('Image upload to Cloudinary failed.');
+  }
+
+  const data = await response.json();
+  return data.secure_url;
+}
 
 export interface Event {
   id: string;
   title: string;
+  slug?: string;
   description?: string;
-  event_date: string;
+  event_date: string; 
+  start_time: string; 
+  end_time: string;   
   location?: string;
   status: 'draft' | 'published' | 'cancelled';
-  is_featured: boolean;
   category?: string;
-  theme?: string;
   featured_image_url?: string;
   external_registration_url?: string;
-  calculated_state?: string;
-  images?: any[];
 }
 
-export interface EventListResponse {
-  items: Event[];
-  total: number;
-}
+const PAGE_SIZE = 9;
 
-export function useEvents(params: any = {}) {
-  return useQuery<EventListResponse>({
-    queryKey: ['events', params],
-    queryFn: async () => ({
-      items: [
-        {
-          id: '1',
-          title: 'FIC Flagship Summit 2024',
-          event_date: '2026-04-25T10:00:00Z',
-          location: 'Innovation Hub, Bengaluru',
-          status: 'published',
-          is_featured: true,
-          category: 'FIC',
-          calculated_state: 'registration_open',
-          featured_image_url: 'https://picsum.photos/seed/fic/800/800',
-          description: 'Building a startup? Or already running one? Come join us at Namma Bengaluru Startups Meetup – a chill and meaningful gathering for Startup Founders, Co-Founders, Entrepreneurs in bengluru '
-        },
-        {
-          id: '2',
-          title: 'Namma Bengaluru Startups Meetup by CEDAT',
-          event_date: '2026-04-12T10:00:00Z',
-          location: 'Innovation Hub, Bengaluru',
-          status: 'published',
-          is_featured: true,
-          category: 'FIC',
-          calculated_state: 'registration_open',
-          featured_image_url: 'https://picsum.photos/seed/fic/800/800',
-          description: 'Building a startup? Or already running one? Come join us at Namma Bengaluru Startups Meetup – a chill and meaningful gathering for Startup Founders, Co-Founders, Entrepreneurs'
+type EventsPage = {
+  events: Event[];
+  lastDoc: QueryDocumentSnapshot | null;
+};
+
+export function useEvents({ 
+  status_filter, 
+  pageSize = PAGE_SIZE, 
+  initialData 
+}: { 
+  status_filter?: string, 
+  pageSize?: number,
+  initialData?: Event[]
+} = {}) {
+  const db = useFirestore();
+
+  const fetchEvents = async (context: QueryFunctionContext): Promise<EventsPage> => {
+    const pageParam = context.pageParam as QueryDocumentSnapshot | null;
+    const constraints: QueryConstraint[] = [orderBy('event_date', 'desc'), limit(pageSize)];
+    if (status_filter) {
+      constraints.push(where('status', '==', status_filter));
+    }
+    if (pageParam) {
+      constraints.push(startAfter(pageParam));
+    }
+    const q = query(collection(db, 'events'), ...constraints);
+    const snapshot = await getDocs(q);
+    const newEvents = snapshot.docs.map(d => ({ id: d.id, ...d.data() })) as Event[];
+    const lastDoc = snapshot.docs[snapshot.docs.length - 1] || null;
+    return { events: newEvents, lastDoc };
+  };
+
+  const { 
+    data, 
+    fetchNextPage, 
+    hasNextPage, 
+    isLoading, 
+    isFetchingNextPage, 
+    error 
+  } = useInfiniteQuery<EventsPage, Error> ({
+    queryKey: ['events', { status_filter }],
+    queryFn: fetchEvents,
+    initialPageParam: null,
+    getNextPageParam: (lastPage: EventsPage) => {
+      if (lastPage.events.length < pageSize) return undefined; 
+      return lastPage.lastDoc;
+    },
+    initialData: initialData 
+      ? {
+          pages: [{ events: initialData, lastDoc: null }],
+          pageParams: [null],
         }
-      ],
-      total: 1
-    }),
+      : undefined,
   });
+
+  const allEvents = data?.pages.flatMap(page => page.events) || [];
+
+  return {
+    events: allEvents,
+    loadMore: fetchNextPage,
+    hasMore: !!hasNextPage,
+    isLoading,
+    isLoadingMore: isFetchingNextPage,
+    error,
+  };
 }
 
 export function useEvent(id: string) {
-  return useQuery<Event | null>({
-    queryKey: ['event', id],
-    queryFn: async () => null,
-  });
+  const db = useFirestore();
+  const eventRef = useMemoFirebase(() => id ? doc(db, 'events', id) : null, [db, id]);
+  return useDoc<Event>(eventRef);
 }
 
-export function useFICEvent() {
-  return useQuery<Event | null>({
-    queryKey: ['fic-event'],
-    queryFn: async () => ({
-      id: 'fic-1',
-      title: 'Founders Innovation Circle (FIC)',
-      event_date: '2026-04-24T10:00:00Z',
-      location: 'The Nexus, MG Road',
-      status: 'published',
-      is_featured: true,
-      category: 'FIC',
-      calculated_state: 'registration_open',
-      featured_image_url: 'https://picsum.photos/seed/fic-main/800/800',
-      description: 'Join our flagship community event.'
-    }),
-  });
-}
+export function useCreateEvent() {
+  const queryClient = useQueryClient();
+  const db = useFirestore();
 
-export function useRegisterForEvent() {
   return useMutation({
-    mutationFn: async ({ eventId, metadata }: { eventId: string; metadata: any }) => ({ id: 'reg-1', attendance_status: 'registered' }),
+    mutationFn: async ({ eventData, imageFile }: { eventData: Partial<Event>, imageFile: File | null }) => {
+        const { featured_image_url, ...restEventData } = eventData;
+        const eventDocRef = await addDoc(collection(db, 'events'), { ...restEventData, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+        const slug = generateSlug(eventData.title!, eventData.event_date!, eventDocRef.id);
+        const updatePayload: { [key: string]: any } = { slug };
+        
+        if (imageFile) {
+            const imageUrl = await uploadToCloudinary(imageFile);
+            updatePayload.featured_image_url = imageUrl;
+        } else if (featured_image_url) {
+            updatePayload.featured_image_url = featured_image_url;
+        }
+
+        await updateDoc(eventDocRef, updatePayload);
+        return eventDocRef;
+    },
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['events'] });
+        revalidateEventsList();
+    },
   });
 }
 
-export function useUnregisterForEvent() {
+export function useUpdateEvent() {
+  const queryClient = useQueryClient();
+  const db = useFirestore();
+
   return useMutation({
-    mutationFn: async (registrationId: string) => ({ success: true }),
+    mutationFn: async ({ eventId, eventData, imageFile }: { eventId: string; eventData: Partial<Event>; imageFile: File | null }) => {
+        const docRef = doc(db, 'events', eventId);
+        const { featured_image_url, ...restEventData } = eventData;
+        const updatePayload: { [key: string]: any } = { ...restEventData, updatedAt: serverTimestamp() };
+        if (eventData.title && eventData.event_date) {
+            updatePayload.slug = generateSlug(eventData.title, eventData.event_date, eventId);
+        }
+
+        if (imageFile) {
+            const imageUrl = await uploadToCloudinary(imageFile);
+            updatePayload.featured_image_url = imageUrl;
+        } else {
+          updatePayload.featured_image_url = featured_image_url;
+        }
+
+        await updateDoc(docRef, updatePayload);
+    },
+    onSuccess: (_data, { eventId }) => {
+        queryClient.invalidateQueries({ queryKey: ['events'] });
+        revalidateEventsList();
+        revalidateEventDetail(eventId);
+    },
   });
 }
 
-export function useCreateEvent() { return useMutation({ mutationFn: async (data: any) => ({ id: 'new-id' }) }); }
-export function useUpdateEvent() { return useMutation({ mutationFn: async ({ eventId, eventData }: any) => ({ id: eventId }) }); }
-export function useDeleteEvent() { return useMutation({ mutationFn: async (id: string) => ({ success: true }) }); }
-export function useUploadEventImage() { return useMutation({ mutationFn: async ({ eventId, file }: any) => ({ image_url: '' }) }); }
-export function useUpdateEventImage() { return useMutation({ mutationFn: async ({ eventId, imageId, body }: any) => ({ success: true }) }); }
-export function useDeleteEventImage() { return useMutation({ mutationFn: async ({ eventId, imageId }: any) => ({ success: true }) }); }
+export function useDeleteEvent() {
+  const queryClient = useQueryClient();
+  const db = useFirestore();
+
+  return useMutation({
+    mutationFn: (id: string) => deleteDoc(doc(db, 'events', id)),
+    onSuccess: (_data, eventId) => {
+        queryClient.invalidateQueries({ queryKey: ['events'] });
+        revalidateEventsList();
+        revalidateEventDetail(eventId);
+    },
+  });
+}

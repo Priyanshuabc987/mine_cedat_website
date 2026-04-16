@@ -1,47 +1,52 @@
+"use client";
 
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, MapPin, Clock } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { Event } from '@/hooks/useEvents';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
+import { useState, useEffect } from 'react';
+// 1. IMPORT new utility functions
+import { getEventStatus, formatTime } from '@/lib/utils';
 
 interface EventCardProps {
   event: Event;
 }
 
+// This hook remains for client-side rendering
+const useHydrated = () => {
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => { setHydrated(true) }, []);
+  return hydrated;
+};
+
 export function EventCard({ event }: EventCardProps) {
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return {
-      day: date.toLocaleDateString('en-US', { day: 'numeric' }),
-      month: date.toLocaleDateString('en-US', { month: 'long' }),
-      time: date.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-      }),
-      full: date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        day: 'numeric',
-        month: 'long'
-      })
-    };
+  const isHydrated = useHydrated();
+
+  // 2. USE the new, centralized utility functions
+  const eventStatus = isHydrated 
+    ? getEventStatus(event.event_date, event.start_time, event.end_time) 
+    : { text: 'Loading...', variant: 'outline' as const }; // Use 'as const' for type safety
+  
+  const startTimeFormatted = formatTime(event.start_time);
+  const endTimeFormatted = formatTime(event.end_time);
+
+  const dateInfo = {
+    day: new Date(event.event_date).toLocaleDateString('en-US', { day: 'numeric' }),
+    month: new Date(event.event_date).toLocaleDateString('en-US', { month: 'long' }),
+    full: new Date(event.event_date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      day: 'numeric',
+      month: 'long'
+    })
   };
 
-  const dateInfo = formatDate(event.event_date);
-  const isPast = new Date(event.event_date) < new Date();
+  const canRegister = eventStatus.text !== 'Concluded';
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-      className="h-full"
-    >
-      <Link href={`/events/${event.id}`} className="block h-full">
+    <div className="h-full">
+      <Link href={event.slug ? `/events/${event.slug}`: '#'} className={`block h-full ${!event.slug ? 'pointer-events-none' : ''}`}>
         <Card className="group relative bg-card rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden border border-border/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full flex flex-col min-h-0">
           <div className="aspect-square bg-muted relative overflow-hidden">
             {event.featured_image_url ? (
@@ -57,13 +62,9 @@ export function EventCard({ event }: EventCardProps) {
             )}
 
             <div className="absolute top-2 sm:top-4 left-2 sm:left-4 z-20">
-              <Badge
-                className={`text-[10px] sm:text-xs whitespace-nowrap w-fit shadow-md border-none ${isPast
-                    ? 'bg-red-600 text-white hover:bg-red-700'
-                    : 'bg-primary text-white hover:bg-primary/90'
-                  }`}
-              >
-                {isPast ? 'Ended' : 'Upcoming'}
+              {/* 3. FIX: The variant is now type-safe and correct */}
+              <Badge variant={eventStatus.variant} className="text-[10px] sm:text-xs whitespace-nowrap w-fit shadow-md border-none">
+                {eventStatus.text}
               </Badge>
             </div>
 
@@ -81,13 +82,16 @@ export function EventCard({ event }: EventCardProps) {
               <span className="hidden sm:inline text-muted-foreground/50">•</span>
               <span className="flex items-center gap-1.5 min-w-0">
                 <Clock className="w-3.5 h-3.5 flex-shrink-0" />
-                <span className="truncate">{dateInfo.time}</span>
+                {/* 4. FIX: Time is now correctly formatted to AM/PM */}
+                <span className="truncate">
+                  {isHydrated ? `${startTimeFormatted} - ${endTimeFormatted}` : <span>&nbsp;</span>}
+                </span>
               </span>
               {event.location && (
                 <>
                   <span className="hidden sm:inline text-muted-foreground/50">•</span>
                   <span className="flex items-center gap-1.5 min-w-0">
-                    <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+                    <MapPin className="w-3.5 h-3.na5 flex-shrink-0" />
                     <span className="truncate">{event.location}</span>
                   </span>
                 </>
@@ -104,26 +108,25 @@ export function EventCard({ event }: EventCardProps) {
               </p>
             )}
 
-<div className="mt-auto pt-4 text-right">
-  <p 
-    className={`inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-full border-2 transition-all 
-      ${isPast 
-        ? 'bg-zinc-100 border-zinc-200 text-zinc-400 cursor-not-allowed opacity-70' 
-        : 'bg-black border-slate-200 text-white group-hover:bg-primary group-hover:border-primary group-hover:underline'
-      }`}
-  >
-    {isPast ? (
-      <>Registration Closed <span className="ml-1">✕</span></>
-    ) : (
-      <>Register Now <span className="ml-1">→</span></>
-    )}
-  </p>
-</div>
-
+            <div className="mt-auto pt-4 text-right">
+               <p 
+                className={`inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-full border-2 transition-all 
+                  ${!canRegister 
+                    ? 'bg-zinc-100 border-zinc-200 text-zinc-400 cursor-not-allowed opacity-70' 
+                    : 'bg-black border-slate-200 text-white group-hover:bg-primary group-hover:border-primary group-hover:underline'
+                  }`}
+              >
+                {!canRegister ? (
+                  <>Registration Closed <span className="ml-1">✕</span></>
+                ) : (
+                  <>Register Now <span className="ml-1">→</span></>
+                )}
+              </p>
+            </div>
 
           </div>
         </Card>
       </Link>
-    </motion.div>
+    </div>
   );
 }

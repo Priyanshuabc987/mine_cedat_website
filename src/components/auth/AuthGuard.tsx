@@ -15,13 +15,17 @@ export function AuthGuard({ children, requireAdmin = false, redirectTo = '/login
 
   useEffect(() => {
     if (!isLoading) {
+      // If user is not authenticated, always redirect to the login page.
       if (!isAuthenticated) {
         router.push(redirectTo);
         return;
       }
 
-      if (requireAdmin && user && !user.is_admin) {
-        router.push('/');
+      // If admin is required and the authenticated user is not an admin,
+      // redirect them to the login page as well. This allows them to sign in
+      // with a different, administrative account.
+      if (requireAdmin && user && !user.roles.includes('admin')) {
+        router.push(redirectTo); // Change this from '/' to redirectTo
         return;
       }
     }
@@ -35,11 +39,13 @@ export function AuthGuard({ children, requireAdmin = false, redirectTo = '/login
     );
   }
 
+  // If the logic above is running, these checks prevent rendering the children
+  // before the redirect effect has a chance to run.
   if (!isAuthenticated) {
     return null;
   }
 
-  if (requireAdmin && user && !user.is_admin) {
+  if (requireAdmin && user && !user.roles.includes('admin')) {
     return null;
   }
 

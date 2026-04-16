@@ -1,420 +1,73 @@
+
 {
   "entities": {
     "Event": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Event",
       "type": "object",
-      "description": "Represents an event organized by Cedat, including its details, schedule, and associated media.",
+      "description": "A community event or meetup.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Event entity."
-        },
-        "title": {
-          "type": "string",
-          "description": "The title of the event."
-        },
-        "description": {
-          "type": "string",
-          "description": "A detailed description of the event."
-        },
-        "startDate": {
-          "type": "string",
-          "description": "The start date and time of the event.",
-          "format": "date-time"
-        },
-        "endDate": {
-          "type": "string",
-          "description": "The end date and time of the event.",
-          "format": "date-time"
-        },
-        "location": {
-          "type": "string",
-          "description": "The physical or virtual location of the event."
-        },
-        "imageUrls": {
-          "type": "array",
-          "description": "An array of URLs pointing to images associated with the event.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the event record was created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp when the event record was last updated.",
-          "format": "date-time"
-        }
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "event_date": { "type": "string", "format": "date-time" },
+        "location": { "type": "string" },
+        "status": { "type": "string", "enum": ["draft", "published", "cancelled"] },
+        "is_featured": { "type": "boolean" },
+        "category": { "type": "string" },
+        "theme": { "type": "string" },
+        "featured_image_url": { "type": "string" },
+        "external_registration_url": { "type": "string" }
       },
-      "required": [
-        "id",
-        "title",
-        "description",
-        "startDate",
-        "endDate",
-        "location",
-        "imageUrls",
-        "createdAt",
-        "updatedAt"
-      ]
+      "required": ["title", "event_date", "status"]
     },
-    "EventRegistration": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "EventRegistration",
+    "Setting": {
+      "title": "Setting",
       "type": "object",
-      "description": "Records a user's registration for a specific event.",
+      "description": "General site settings like headings.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the EventRegistration entity."
-        },
-        "eventId": {
-          "type": "string",
-          "description": "Reference to the Event being registered for. (Relationship: Event 1:N EventRegistration)"
-        },
-        "registrantName": {
-          "type": "string",
-          "description": "The full name of the person registering for the event."
-        },
-        "registrantEmail": {
-          "type": "string",
-          "description": "The email address of the person registering for the event.",
-          "format": "email"
-        },
-        "registrationDate": {
-          "type": "string",
-          "description": "The date and time when the registration was submitted.",
-          "format": "date-time"
-        }
+        "value": { "type": "string" }
       },
-      "required": [
-        "id",
-        "eventId",
-        "registrantName",
-        "registrantEmail",
-        "registrationDate"
-      ]
+      "required": ["value"]
     },
     "GalleryImage": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "GalleryImage",
       "type": "object",
-      "description": "Represents an image in the community gallery, showcasing high-resolution photos.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the GalleryImage entity."
-        },
-        "imageUrl": {
-          "type": "string",
-          "description": "The URL of the high-resolution image.",
-          "format": "uri"
-        },
-        "caption": {
-          "type": "string",
-          "description": "An optional caption or description for the image."
-        },
-        "uploadDate": {
-          "type": "string",
-          "description": "The date and time when the image was uploaded.",
-          "format": "date-time"
-        }
+        "image_url": { "type": "string" },
+        "display_order": { "type": "number" },
+        "caption": { "type": "string" }
       },
-      "required": [
-        "id",
-        "imageUrl",
-        "uploadDate"
-      ]
+      "required": ["image_url", "display_order"]
     },
-    "EcosystemStat": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "EcosystemStat",
+    "SocialPost": {
+      "title": "SocialPost",
       "type": "object",
-      "description": "Stores key organizational statistics (metrics) to be displayed dynamically on the Home page.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the EcosystemStat entity. This could be a fixed ID like 'globalStats' if only one document stores all metrics."
-        },
-        "membersCount": {
-          "type": "number",
-          "description": "The total number of members in the ecosystem."
-        },
-        "startupsCount": {
-          "type": "number",
-          "description": "The total number of startups supported by Cedat."
-        },
-        "eventsCount": {
-          "type": "number",
-          "description": "The total number of events organized."
-        },
-        "partnersCount": {
-          "type": "number",
-          "description": "The total number of partners collaborating with Cedat."
-        },
-        "projectsCount": {
-          "type": "number",
-          "description": "The total number of projects undertaken."
-        },
-        "lastUpdated": {
-          "type": "string",
-          "description": "The timestamp when these statistics were last updated.",
-          "format": "date-time"
-        }
+        "post_url": { "type": "string" },
+        "platform": { "type": "string", "enum": ["instagram", "linkedin"] },
+        "created_at": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "id",
-        "membersCount",
-        "startupsCount",
-        "eventsCount",
-        "partnersCount",
-        "projectsCount",
-        "lastUpdated"
-      ]
-    },
-    "StartupWorldCupMilestone": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "StartupWorldCupMilestone",
-      "type": "object",
-      "description": "Defines a milestone in the Startup World Cup timeline, including its details and date.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the StartupWorldCupMilestone entity."
-        },
-        "title": {
-          "type": "string",
-          "description": "The title of the milestone (e.g., 'Applications Open')."
-        },
-        "description": {
-          "type": "string",
-          "description": "A brief description or additional details for the milestone."
-        },
-        "milestoneDate": {
-          "type": "string",
-          "description": "The specific date and time for this milestone.",
-          "format": "date-time"
-        },
-        "order": {
-          "type": "number",
-          "description": "A numerical value to define the display order of milestones in the timeline."
-        }
-      },
-      "required": [
-        "id",
-        "title",
-        "milestoneDate",
-        "order"
-      ]
-    },
-    "WhyAttendFeature": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "WhyAttendFeature",
-      "type": "object",
-      "description": "Describes a key feature or benefit for a specific audience category (e.g., Startups, Corporations) regarding the Startup World Cup.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the WhyAttendFeature entity."
-        },
-        "targetAudience": {
-          "type": "string",
-          "description": "The target audience for this feature (e.g., 'Startups', 'Corporations', 'Investors')."
-        },
-        "title": {
-          "type": "string",
-          "description": "The title of the feature card."
-        },
-        "description": {
-          "type": "string",
-          "description": "A detailed description of the benefit or feature."
-        },
-        "iconName": {
-          "type": "string",
-          "description": "The name of the Lucide React icon to be displayed with this feature. This name should correspond to a valid Lucide icon component."
-        }
-      },
-      "required": [
-        "id",
-        "targetAudience",
-        "title",
-        "description",
-        "iconName"
-      ]
-    },
-    "PartnerLogo": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "PartnerLogo",
-      "type": "object",
-      "description": "Represents a partner's logo to be displayed, typically in a grid format on the Startup World Cup page.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the PartnerLogo entity."
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the partner organization."
-        },
-        "logoUrl": {
-          "type": "string",
-          "description": "The URL to the partner's logo image.",
-          "format": "uri"
-        },
-        "websiteUrl": {
-          "type": "string",
-          "description": "An optional URL to the partner's official website.",
-          "format": "uri"
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "logoUrl"
-      ]
+      "required": ["post_url", "platform", "created_at"]
     }
   },
   "auth": {
-    "providers": [
-      "password",
-      "anonymous"
-    ]
+    "providers": ["password"]
   },
   "firestore": {
-    "structure": [
-      {
-        "path": "/roles_admin/{userId}",
-        "definition": {
-          "entityName": "adminRole",
-          "schema": {
-            "$ref": "#/backend/entities/AdminRole"
-          },
-          "description": "Defines users with administrator privileges. The existence of a document at this path signifies that the {userId} is an admin. Used for DBAC and authorization checks. Includes denormalized 'userId' as the document ID for authorization independence.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The Firebase Authentication UID of the administrator."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/events/{eventId}",
-        "definition": {
-          "entityName": "Event",
-          "schema": {
-            "$ref": "#/backend/entities/Event"
-          },
-          "description": "Collection for all public events displayed on the Cedat website. Documents are publicly readable but only administrators can create, update, or delete them. This enables QAPs for public lists and admin-only management.",
-          "params": [
-            {
-              "name": "eventId",
-              "description": "Unique identifier for the event."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/eventRegistrations/{registrationId}",
-        "definition": {
-          "entityName": "EventRegistration",
-          "schema": {
-            "$ref": "#/backend/entities/EventRegistration"
-          },
-          "description": "Collection for event registrations. Any user (authenticated or unauthenticated) can create a new registration document. Only administrators can read, update, or delete registrations. This provides authorization independence for registration submissions and secures sensitive registration data.",
-          "params": [
-            {
-              "name": "registrationId",
-              "description": "Unique identifier for the event registration."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/galleryImages/{imageId}",
-        "definition": {
-          "entityName": "GalleryImage",
-          "schema": {
-            "$ref": "#/backend/entities/GalleryImage"
-          },
-          "description": "Collection for high-resolution community gallery images. Documents are publicly readable, allowing for public display. Only administrators can create, update, or delete images. This enables QAPs for public lists and admin-only management.",
-          "params": [
-            {
-              "name": "imageId",
-              "description": "Unique identifier for the gallery image."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/ecosystemStats/global",
-        "definition": {
-          "entityName": "EcosystemStat",
-          "schema": {
-            "$ref": "#/backend/entities/EcosystemStat"
-          },
-          "description": "Single document (`id: 'global'`) storing key organizational statistics to be displayed dynamically. Publicly readable for the UI. Only administrators can update this document. This enables QAPs for a single public read and admin-only management.",
-          "params": [
-            {
-              "name": "global",
-              "description": "Fixed document ID for the single global ecosystem statistics record."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/startupWorldCupMilestones/{milestoneId}",
-        "definition": {
-          "entityName": "StartupWorldCupMilestone",
-          "schema": {
-            "$ref": "#/backend/entities/StartupWorldCupMilestone"
-          },
-          "description": "Collection for Startup World Cup timeline milestones. Documents are publicly readable for displaying the timeline. Only administrators can create, update, or delete milestones. This enables QAPs for public lists and admin-only management.",
-          "params": [
-            {
-              "name": "milestoneId",
-              "description": "Unique identifier for the milestone."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/whyAttendFeatures/{featureId}",
-        "definition": {
-          "entityName": "WhyAttendFeature",
-          "schema": {
-            "$ref": "#/backend/entities/WhyAttendFeature"
-          },
-          "description": "Collection for 'Why Attend?' features related to the Startup World Cup. Documents are publicly readable for display. Only administrators can create, update, or delete features. This enables QAPs for public lists and admin-only management.",
-          "params": [
-            {
-              "name": "featureId",
-              "description": "Unique identifier for the 'Why Attend?' feature."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/partnerLogos/{partnerId}",
-        "definition": {
-          "entityName": "PartnerLogo",
-          "schema": {
-            "$ref": "#/backend/entities/PartnerLogo"
-          },
-          "description": "Collection for partner logos displayed on the Startup World Cup page. Documents are publicly readable. Only administrators can create, update, or delete logos. This enables QAPs for public lists and admin-only management.",
-          "params": [
-            {
-              "name": "partnerId",
-              "description": "Unique identifier for the partner logo."
-            }
-          ]
-        }
-      }
-    ],
-    "reasoning": "The Firestore data structure for the Cedat application is designed with a strong emphasis on security, scalability, and debuggability, adhering to the core design principles of Authorization Independence, Structural Segregation, DBAC, and QAPs. The primary goal is to support an admin-managed content system where most data is publicly readable for the UI, while write access is strictly controlled by an admin role.\n\n**Authorization Independence:** This design achieves authorization independence by ensuring that no document's access permissions depend on `get()` calls to its parent or any other document's attributes. All collections either have a global, public-read posture or an admin-only read posture, or allow public writes independently. For instance, `eventRegistrations` can be created by any user without needing to check permissions on the `Event` it relates to; the `eventId` is merely a data point within the registration document itself. Admin authentication is handled via a dedicated `/roles_admin` collection, which allows rules to check `get(/roles_admin/$(request.auth.uid))` directly, without complex hierarchical lookups.\n\n**QAPs (Rules are not Filters):** To ensure secure `list` operations and prevent security rules from implicitly filtering query results, the design employs **Structural Segregation**. All content collections intended for public display (`/events`, `/galleryImages`, `/ecosystemStats`, `/startupWorldCupMilestones`, `/whyAttendFeatures`, `/partnerLogos`) are explicitly designated as publicly readable. Their security rules will permit `list` and `get` operations for all users. This means that clients can query these collections without restrictions imposed by rules, ensuring that the full dataset (as allowed by the public posture) is returned, enabling robust client-side caching strategies. Conversely, the `/eventRegistrations` collection is segregated to allow public `create` but restrict `list` and `get` to only authenticated administrators, clearly defining who can see aggregated data without filtering by individual user attributes. The `/roles_admin` collection strictly uses `get` for role checking, not for listing, ensuring its integrity.\n\n**Structural Segregation & Access Modeling:**\n*   **Public Read, Admin Write Collections:** Most public-facing content (Events, Gallery Images, Ecosystem Stats, Startup World Cup Milestones, Why Attend Features, Partner Logos) reside in top-level collections. These are structured for maximum clarity, allowing `read: true` for everyone and `write: isAdmin()` for authorized administrators.\n*   **Public Create, Admin Read Collection:** `EventRegistration` is a top-level collection (`/eventRegistrations`). This allows any user to `create` a registration without authentication, while `read`, `update`, and `delete` operations are strictly limited to administrators.\n*   **Admin Role (DBAC):** A dedicated collection `/roles_admin/{userId}` is used for Database Access Control. The existence of a document at this path signifies administrator privileges for the corresponding `userId`. This uses the 'Existence over Content' principle, simplifying role checks in security rules."
+    "/events/{eventId}": {
+      "schema": { "$ref": "#/entities/Event" },
+      "description": "Collection of community events."
+    },
+    "/settings/{settingId}": {
+      "schema": { "$ref": "#/entities/Setting" },
+      "description": "Global UI settings (e.g., page headings)."
+    },
+    "/gallery/{imageId}": {
+      "schema": { "$ref": "#/entities/GalleryImage" },
+      "description": "Images for the community gallery."
+    },
+    "/socialPosts/{postId}": {
+      "schema": { "$ref": "#/entities/SocialPost" },
+      "description": "Links to social media posts for embedding."
+    }
   }
 }

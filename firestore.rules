@@ -1,160 +1,17 @@
-/**
- * CEDAT PLATFORM SECURITY RULES
- * 
- * CORE PHILOSOPHY
- * This ruleset implements an administrative-controlled content management system. 
- * It follows a "Public Read, Admin Write" model for marketing content (Events, 
- * Gallery, Stats, Milestones) to allow for high-performance public fetching and 
- * caching, while strictly securing management actions behind a verified 
- * Administrator role.
- * 
- * DATA STRUCTURE
- * - Content collections (events, galleryImages, etc.) are top-level and public.
- * - Event registrations are globally submittable but only visible to Admins.
- * - Roles are managed via a dedicated /roles_admin collection where document 
- *   existence defines a user's permission level.
- * 
- * KEY SECURITY DECISIONS
- * - Role-Based Access Control (RBAC): Admin status is determined by the 
- *   presence of a UID-keyed document in the 'roles_admin' collection.
- * - Public Submission: Event registrations allow unauthenticated creation 
- *   to minimize friction for potential attendees, while securing the data 
- *   for internal review only.
- * - Prototyping Flexibility: Rules focus on authorization (WHO can access) 
- *   rather than schema validation (WHAT the data looks like) to facilitate 
- *   rapid UI/UX iteration.
- */
 
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // --- HELPER FUNCTIONS ---
-
-    /** @description Checks if the request is from an authenticated user. */
-    function isSignedIn() {
+    // Helper to check if user is signed in
+    function isAdmin() {
       return request.auth != null;
     }
 
-    /** @description Checks if the authenticated user's UID matches the provided ID. */
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-
-    /** @description Checks if the authenticated user has an entry in the admin roles collection. */
-    function isAdmin() {
-      return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
-    }
-
-    /** @description Verifies a document exists before allowing update or delete. */
-    function existsForWrite() {
-      return resource != null;
-    }
-
-    // --- COLLECTION RULES ---
-
-    /**
-     * @description Admin role definitions. Existence of a document here grants admin privileges.
-     * @path /roles_admin/{userId}
-     * @allow (get) Any user checking their own role status.
-     * @deny (list) Unauthorized users trying to see all admins.
-     * @principle Database Access Control (DBAC) using existence-over-content.
-     */
-    match /roles_admin/{userId} {
-      allow get: if isOwner(userId) || isAdmin();
-      allow list: if isAdmin();
-      allow create, update, delete: if isAdmin();
-    }
-
-    /**
-     * @description Publicly viewable events managed by administrators.
-     * @path /events/{eventId}
-     * @allow (get, list) Public access for website visitors.
-     * @deny (create) Non-admin users attempting to post events.
-     * @principle Public Read with Admin-Only Writes.
-     */
-    match /events/{eventId} {
-      allow get, list: if true;
-      allow create: if isAdmin();
-      allow update, delete: if isAdmin() && existsForWrite();
-    }
-
-    /**
-     * @description Submissions for event registration.
-     * @path /eventRegistrations/{registrationId}
-     * @allow (create) Anyone (including guests) can register for an event.
-     * @deny (get, list) Non-admins trying to access personal registration details.
-     * @principle Structural Segregation: Public input with administrative oversight.
-     */
-    match /eventRegistrations/{registrationId} {
-      allow create: if true;
-      allow get, list: if isAdmin();
-      allow update, delete: if isAdmin() && existsForWrite();
-    }
-
-    /**
-     * @description Gallery images showcasing community activities.
-     * @path /galleryImages/{imageId}
-     * @allow (get, list) Public access for gallery viewing.
-     * @deny (delete) Users without admin rights trying to remove media.
-     * @principle Public Read with Admin-Only Writes.
-     */
-    match /galleryImages/{imageId} {
-      allow get, list: if true;
-      allow create: if isAdmin();
-      allow update, delete: if isAdmin() && existsForWrite();
-    }
-
-    /**
-     * @description Global ecosystem statistics (counters for members, projects, etc.).
-     * @path /ecosystemStats/global
-     * @allow (get) Public access for the home page metrics.
-     * @deny (update) Automated bots or guests trying to change stats.
-     * @principle Fixed-path document protection for critical metrics.
-     */
-    match /ecosystemStats/{docId} {
-      allow get, list: if true;
-      allow create: if isAdmin();
-      allow update, delete: if isAdmin() && existsForWrite();
-    }
-
-    /**
-     * @description Milestones for the Startup World Cup timeline.
-     * @path /startupWorldCupMilestones/{milestoneId}
-     * @allow (list) Public access for the timeline UI component.
-     * @deny (create) Unauthorized users trying to alter the event schedule.
-     * @principle Public Read with Admin-Only Writes.
-     */
-    match /startupWorldCupMilestones/{milestoneId} {
-      allow get, list: if true;
-      allow create: if isAdmin();
-      allow update, delete: if isAdmin() && existsForWrite();
-    }
-
-    /**
-     * @description Value propositions/features for the 'Why Attend' section.
-     * @path /whyAttendFeatures/{featureId}
-     * @allow (get) Publicly readable marketing content.
-     * @deny (update) Attempted edits by non-authenticated users.
-     * @principle Public Read with Admin-Only Writes.
-     */
-    match /whyAttendFeatures/{featureId} {
-      allow get, list: if true;
-      allow create: if isAdmin();
-      allow update, delete: if isAdmin() && existsForWrite();
-    }
-
-    /**
-     * @description Partner and sponsor logos for display.
-     * @path /partnerLogos/{partnerId}
-     * @allow (list) Public display of organizational partners.
-     * @deny (create) Authenticated users who are not admins trying to add logos.
-     * @principle Public Read with Admin-Only Writes.
-     */
-    match /partnerLogos/{partnerId} {
-      allow get, list: if true;
-      allow create: if isAdmin();
-      allow update, delete: if isAdmin() && existsForWrite();
+    // Public read access for all content
+    // Admin-only write access
+    match /{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
   }
 }
