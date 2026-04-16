@@ -43,3 +43,11 @@ export async function revalidateGalleryPhotos() {
 export async function revalidateGalleryVideos() {
   revalidateTag('videos');
 }
+
+/**
+ * Revalidates the cache for the hero images on the home page.
+ * Call this when images are added, deleted, or reordered.
+ */
+export async function revalidateHeroImages() {
+  revalidateTag('hero');
+}

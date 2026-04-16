@@ -5,16 +5,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { HeroItem } from "@/lib/types";
 
-export function Hero() {
+export function Hero({ initialImages }: { initialImages: HeroItem[] }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const heroImages = [
-    "/hero/3a232ebc-2401-4ed9-94e7-d3b03f518bae.jpg",
-    "/hero/3b016280-01a4-4f6d-8c0f-a6c395f60b81.jpg",
-    "/hero/4f4ee7e7-d2ac-4a39-8927-421caec8a7ca.jpeg",
-    "/hero/82d9dfc8-721b-4cdf-b4bf-9d94439ff76e.jpeg",
-  ];
+  const heroImages = initialImages || [];
 
   // Auto-rotate images
   useEffect(() => {
@@ -43,8 +39,8 @@ export function Hero() {
           <AnimatePresence mode="wait">
             <motion.img
               key={currentImageIndex}
-              src={heroImages[currentImageIndex]}
-              alt={`Hero ${currentImageIndex}`}
+              src={heroImages[currentImageIndex].url}
+              alt={heroImages[currentImageIndex].caption || `Hero ${currentImageIndex}`}
               className="w-full h-full object-cover"
               initial={{ opacity: 0.7, scale: 1.1 }}
               animate={{ opacity: 1, scale: 1 }}

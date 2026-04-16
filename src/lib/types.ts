@@ -15,6 +15,17 @@ export interface GalleryItem {
 }
 
 /**
+ * Represents a single item in the hero section.
+ */
+export interface HeroItem {
+  id: string;
+  url: string;
+  display_order: number;
+  caption?: string; // Optional caption for the hero item
+  createdAt: any; // Firestore timestamp
+}
+
+/**
  * Represents a single event.
  * This is a placeholder and should be expanded based on the Event interface in useEvents.ts
  */
