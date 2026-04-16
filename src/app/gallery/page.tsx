@@ -1,41 +1,24 @@
 
-"use client";
+import { getGalleryPhotos, getGalleryVideos } from "@/lib/data/gallery";
+import { GalleryPageClient } from "@/components/gallery/GalleryPageClient";
+import { generateSEO, seoConfigs } from "@/lib/seo";
+import { Metadata } from "next";
 
-import { EventGallery } from "@/components/gallery/EventGallery";
-import { GalleryPhotos } from "@/components/gallery/GalleryPhotos";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+// Generate SEO metadata for the page, providing a fallback for the null case.
+export const metadata: Metadata = generateSEO(seoConfigs.gallery) || {};
 
-export default function GalleryPage() {
-  return (
-    <div className="min-h-screen bg-background pt-32 pb-20">
-      <div className="container mx-auto px-4 text-center mb-16">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6">
-          Community <span className="text-primary italic">Moments</span>
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Capturing the energy of innovation. See what happens when the ecosystem unites across workshops, pitches, and conferences.
-        </p>
-      </div>
+/**
+ * This is the main Server Component for the /gallery page.
+ * It is responsible for fetching the initial data and passing it to a client component.
+ */
+export default async function GalleryPage() {
+  // Fetch photos and videos in parallel for maximum efficiency.
+  // This uses the cached data-fetching functions from /lib/data/gallery.ts
+  const [photos, videos] = await Promise.all([
+    getGalleryPhotos(),
+    getGalleryVideos(),
+  ]);
 
-      <Tabs defaultValue="events" className="container mx-auto px-4">
-        <div className="flex justify-center mb-12">
-          <TabsList className="rounded-full p-1 bg-muted/50 border h-auto">
-            <TabsTrigger value="events" className="rounded-full px-8 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-white">
-              Event Stories
-            </TabsTrigger>
-            <TabsTrigger value="photos" className="rounded-full px-8 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-white">
-              All Photos
-            </TabsTrigger>
-          </TabsList>
-        </div>
-
-        <TabsContent value="events">
-          <EventGallery />
-        </TabsContent>
-        <TabsContent value="photos">
-          <GalleryPhotos />
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
+  // Render the client component and pass the fetched data as props.
+  return <GalleryPageClient photos={photos} videos={videos} />;
 }

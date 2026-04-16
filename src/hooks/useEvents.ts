@@ -6,26 +6,9 @@ import { collection, query, where, orderBy, doc, deleteDoc, updateDoc, addDoc, s
 import { useMutation, useQueryClient, useInfiniteQuery, QueryFunctionContext } from '@tanstack/react-query';
 import { generateSlug } from '@/lib/utils';
 import { revalidateEventsList, revalidateEventDetail } from '@/lib/actions/revalidate';
+import { uploadToCloudinary } from '@/lib/cloudinary'; // Import the function
 
-async function uploadToCloudinary(file: File): Promise<string> {
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
-
-  const response = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!}/image/upload`, {
-    method: 'POST',
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    console.error('Cloudinary upload failed:', errorData);
-    throw new Error('Image upload to Cloudinary failed.');
-  }
-
-  const data = await response.json();
-  return data.secure_url;
-}
+// The uploadToCloudinary function has been removed from here
 
 export interface Event {
   id: string;

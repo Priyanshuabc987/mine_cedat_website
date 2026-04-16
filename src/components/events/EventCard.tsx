@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -53,7 +54,8 @@ export function EventCard({ event }: EventCardProps) {
               <ImageWithFallback
                 src={event.featured_image_url}
                 alt={event.title}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
@@ -113,7 +115,7 @@ export function EventCard({ event }: EventCardProps) {
                 className={`inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-full border-2 transition-all 
                   ${!canRegister 
                     ? 'bg-zinc-100 border-zinc-200 text-zinc-400 cursor-not-allowed opacity-70' 
-                    : 'bg-black border-slate-200 text-white group-hover:bg-primary group-hover:border-primary group-hover:underline'
+                    : 'bg-black border-slate-200 text-white group-hover:bg-primary group-hover:border-primary group-hover:underline'                  
                   }`}
               >
                 {!canRegister ? (

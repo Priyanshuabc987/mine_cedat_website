@@ -27,3 +27,19 @@ export async function revalidateEventDetail(eventId: string) {
 export async function revalidateSocialPosts() {
   revalidateTag('social-posts');
 }
+
+/**
+ * Revalidates the cache for the gallery photos.
+ * Call this from your admin panel whenever a photo is added, updated, or deleted.
+ */
+export async function revalidateGalleryPhotos() {
+  revalidateTag('photos');
+}
+
+/**
+ * Revalidates the cache for the gallery videos.
+ * Call this from your admin panel whenever a video is added, updated, or deleted.
+ */
+export async function revalidateGalleryVideos() {
+  revalidateTag('videos');
+}
