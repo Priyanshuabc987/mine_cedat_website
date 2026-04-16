@@ -12,10 +12,14 @@ interface StaticEventListProps {
  */
 export function StaticEventList({ events }: StaticEventListProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-      {events.map((event) => (
-        <EventCard key={event.id} event={event} />
-      ))}
+    // Add max-w-7xl (or similar) to prevent the cards from stretching too wide
+    <div className="max-w-4xl"> 
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+        {events.map((event) => (
+          <EventCard key={event.id} event={event} />
+        ))}
+      </div>
     </div>
   );
 }
+

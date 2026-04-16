@@ -54,7 +54,6 @@ export const getHeroImages = unstable_cache(
   ['hero', 'images'],
   // Cache options
   { 
-    revalidate: 3600, // Revalidate every hour
     tags: ['hero', 'images'] // Tag for on-demand revalidation
   }
 );

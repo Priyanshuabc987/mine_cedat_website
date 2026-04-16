@@ -86,11 +86,16 @@ export const getEventBySlug = async (slug: string): Promise<Event | null> => {
 
   // This function dynamically creates a cached version of _getEventById for the specific ID.
   // The cache is keyed by the stable ID, not the fragile slug.
-  const getCachedEventById = (id: string) => unstable_cache(
-    async () => _getEventById(id),
-    ['events', id], // Unique, stable cache key
-    { revalidate: 3600, tags: ['events', id] } // Unique, stable tag for revalidation
-  )();
+  const getCachedEventById = (id: string) => 
+    unstable_cache(
+      async () => _getEventById(id),
+      ['events', id], // Unique cache key for this specific ID
+      { 
+        // This tag matches your revalidateTag call exactly
+        tags: [`event:${id}`] 
+      }
+    )();
+  
 
   return getCachedEventById(eventId);
 };

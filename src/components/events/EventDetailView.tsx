@@ -64,9 +64,9 @@ export function EventDetailView({ event, layout = 'default', children }: EventDe
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold break-words leading-tight">
             {event.title}
           </h1>
-          <div className="w-full max-w-lg mx-auto rounded-2xl sm:rounded-3xl overflow-hidden bg-muted lg:mx-0">
+          <div className="relative aspect-[4/4] w-full max-w-lg mx-auto rounded-2xl sm:rounded-3xl overflow-hidden bg-muted lg:mx-0">
             {featuredImageUrl ? (
-              <ImageWithFallback src={featuredImageUrl} alt={event.title} className="w-full h-full object-cover" />
+              <ImageWithFallback src={featuredImageUrl} alt={event.title} fill className="object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-accent/10 to-accent/5">
                 <Calendar className="w-16 h-16 text-muted-foreground" />

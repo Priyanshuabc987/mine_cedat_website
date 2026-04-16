@@ -64,7 +64,6 @@ export const getGalleryPhotos = unstable_cache(
   ['gallery', 'photos'],
   // Cache options
   { 
-    revalidate: 3600, // Revalidate every hour
     tags: ['gallery', 'photos'] // Tag for on-demand revalidation
   }
 );
@@ -80,7 +79,6 @@ export const getGalleryVideos = unstable_cache(
   ['gallery', 'videos'],
   // Cache options
   { 
-    revalidate: 3600, // Revalidate every hour
     tags: ['gallery', 'videos'] // Tag for on-demand revalidation
   }
 );
