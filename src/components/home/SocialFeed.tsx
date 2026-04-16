@@ -3,18 +3,23 @@
 
 import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
-import { useAllSocialPosts, type SocialPost } from "@/hooks/useSocialPosts";
+import { SocialPost } from "@/lib/data/socialposts"; // 1. IMPORT THE TYPE
 
 const LINKEDIN_EMBED_HEIGHT = 620;
 const INSTAGRAM_EMBED_HEIGHT = 610;
 
-export function SocialFeed() {
-  const { data, isLoading, error } = useAllSocialPosts();
-  const posts = data || [];
+// 2. DEFINE THE PROPS FOR THE COMPONENT
+interface SocialFeedProps {
+  initialPosts: SocialPost[];
+}
+
+export function SocialFeed({ initialPosts }: SocialFeedProps) {
+  // 3. REMOVE THE useQuery HOOK
+  const posts = initialPosts || [];
   const linkedinPosts = posts.filter((post) => post.platform === "linkedin");
   const instagramPosts = posts.filter((post) => post.platform === "instagram");
 
+  // This useEffect is for dynamically loading LinkedIn's script, which is fine to keep.
   useEffect(() => {
     if (typeof window !== 'undefined' && linkedinPosts.length > 0) {
       if ((window as any).IN) {
@@ -29,19 +34,10 @@ export function SocialFeed() {
     }
   }, [linkedinPosts]);
 
-  if (isLoading) {
-    return (
-      <section className="py-12 bg-background">
-        <div className="container mx-auto px-4 sm:px-6 md:px-8">
-          <div className="flex items-center justify-center">
-            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-          </div>
-        </div>
-      </section>
-    );
-  }
+  // 4. REMOVE THE LOADING STATE
 
-  if (error || posts.length === 0) {
+  // 5. If there are no posts, render nothing.
+  if (posts.length === 0) {
     return null;
   }
 
@@ -181,4 +177,3 @@ function getInstagramEmbedUrl(url: string): string {
   } catch {}
   return url.includes('/embed') ? url : `${url.split('?')[0]}embed`;
 }
-

@@ -19,3 +19,11 @@ export async function revalidateEventsList() {
 export async function revalidateEventDetail(eventId: string) {
   revalidateTag(`event:${eventId}`);
 }
+
+/**
+ * Revalidates the cache for the social posts feed on the home page.
+ * Call this when posts are added, deleted, or reordered.
+ */
+export async function revalidateSocialPosts() {
+  revalidateTag('social-posts');
+}

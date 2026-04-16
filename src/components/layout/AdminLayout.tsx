@@ -1,11 +1,13 @@
+
 import { Navbar } from '@/components/layout/Navbar';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import { type LucideIcon } from 'lucide-react'; // 1. IMPORT THE LUCIDEICON TYPE
 
 export interface AdminSection {
   id: string;
   label: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon; // 2. USE THE SPECIFIC TYPE
 }
 
 interface AdminLayoutProps {

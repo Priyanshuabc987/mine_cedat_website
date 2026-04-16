@@ -6,14 +6,19 @@ import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Ecosystem } from "@/components/home/Ecosystem";
 import { getEvents } from "@/lib/data/events";
+import { getSocialPosts } from "@/lib/data/socialposts"; // 1. IMPORT THE DATA FETCHER
 import { EventListClient } from "@/components/events/EventListClient";
 
 export default async function Home() {
 
-  const latestEvents = await getEvents({
-    status_filter: "published",
-    page_size: 3
-  });
+  // 2. FETCH BOTH SETS OF DATA IN PARALLEL
+  const [latestEvents, socialPosts] = await Promise.all([
+    getEvents({
+      status_filter: "published",
+      page_size: 3
+    }),
+    getSocialPosts()
+  ]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -22,7 +27,7 @@ export default async function Home() {
       {/* Metrics Section */}
       <section className="container mx-auto px-4 -mt-16 relative z-20">
         <div className="bg-white rounded-3xl p-3 py-6 sm:p-12 shadow-2xl border flex flex-wrap justify-between gap-8 text-center">
-          <div className="flex-1 min-w-[120px]">
+           <div className="flex-1 min-w-[120px]">
             <div className="text-3xl sm:text-4xl font-black text-primary">33K+</div>
             <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">Members</div>
           </div>
@@ -67,7 +72,8 @@ export default async function Home() {
         
       </section>
 
-      <SocialFeed />
+      {/* 3. PASS THE DATA TO THE COMPONENT */}
+      <SocialFeed initialPosts={socialPosts} />
 
       <Ecosystem />
 

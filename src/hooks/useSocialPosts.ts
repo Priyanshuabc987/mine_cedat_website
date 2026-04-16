@@ -1,70 +1,160 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
+
+"use client"; // 1. MARK AS A CLIENT COMPONENT
+
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  orderBy,
+  where,
+  writeBatch,
+  doc,
+  updateDoc,
+  deleteDoc,
+} from "firebase/firestore";
+import { useFirestore } from "@/firebase/index"; // 2. IMPORT THE CLIENT-SIDE HOOK
+import { revalidateSocialPosts } from "@/lib/actions/revalidate";
 
 export interface SocialPost {
   id: string;
   post_url: string;
-  platform: 'instagram' | 'linkedin';
+  platform: "instagram" | "linkedin";
   created_at: string;
+  priority: number;
 }
 
+export interface SocialPostsByPlatform {
+  linkedin: SocialPost[];
+  instagram: SocialPost[];
+}
+
+// --- DATA FETCHING HOOK (for Admin Panel) ---
 export function useSocialPosts() {
-  return useQuery<SocialPost[]>({
-    queryKey: ['social-posts'],
-    queryFn: async () => [],
+  const db = useFirestore(); // 3. USE THE HOOK TO GET THE DB INSTANCE
+  const socialPostsCollection = collection(db, "social_posts");
+
+  return useQuery<SocialPostsByPlatform>({
+    queryKey: ["social-posts"],
+    queryFn: async () => {
+      const linkedinQuery = query(
+        socialPostsCollection,
+        where("platform", "==", "linkedin"),
+        orderBy("priority")
+      );
+      const instagramQuery = query(
+        socialPostsCollection,
+        where("platform", "==", "instagram"),
+        orderBy("priority")
+      );
+
+      const [linkedinSnapshot, instagramSnapshot] = await Promise.all([
+        getDocs(linkedinQuery),
+        getDocs(instagramQuery),
+      ]);
+
+      const linkedinPosts = linkedinSnapshot.docs.map(
+        (doc) => ({ id: doc.id, ...doc.data() } as SocialPost)
+      );
+      const instagramPosts = instagramSnapshot.docs.map(
+        (doc) => ({ id: doc.id, ...doc.data() } as SocialPost)
+      );
+
+      return { linkedin: linkedinPosts, instagram: instagramPosts };
+    },
   });
 }
 
-export function useAllSocialPosts() {
-  return useQuery<SocialPost[]>({
-    queryKey: ['all-social-posts'],
-    queryFn: async () => [
-      {
-        id: "mock-1",
-        platform: "linkedin",
-        post_url: "https://www.linkedin.com/posts/bmsitm-cedat-career-ugcPost-7385585063482228736-5aRs?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD-8UjYBoMlRh5AE-Fgzec5ad8tJ6RDHCGw",
-        created_at: new Date("2026-04-10T10:00:00Z").toISOString(),
-        updated_at: new Date("2026-04-10T10:00:00Z").toISOString(),
-      },
-      {
-        id: "mock-2",
-        platform: "linkedin",
-        post_url: "https://www.linkedin.com/posts/akashakku_cedat-savishkar-srishti-ugcPost-7447161004880453632-EdH-?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD-8UjYBoMlRh5AE-Fgzec5ad8tJ6RDHCGw",
-        created_at: new Date("2026-04-11T12:30:00Z").toISOString(),
-        updated_at: new Date("2026-04-11T12:30:00Z").toISOString(),
-      },
-      {
-        id: "mock-3",
-        platform: "linkedin",
-        post_url: "https://www.linkedin.com/posts/akashakku_cedat-founders-dinner-activity-7445377869280796672-v2Jo?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD-8UjYBoMlRh5AE-Fgzec5ad8tJ6RDHCGw",
-        created_at: new Date("2026-04-11T12:30:00Z").toISOString(),
-        updated_at: new Date("2026-04-11T12:30:00Z").toISOString(),
-      },
-      {
-        id: "mock-4",
-        platform: "instagram",
-        post_url: "https://www.instagram.com/reel/DWnxRbkgP-U/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==",
-        created_at: new Date("2026-04-11T12:30:00Z").toISOString(),
-        updated_at: new Date("2026-04-11T12:30:00Z").toISOString(),
-      },
-      {
-        id: "mock-5",
-        platform: "instagram",
-        post_url: "https://www.instagram.com/p/DWlqsVWk0Ln/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==",
-        created_at: new Date("2026-04-11T12:30:00Z").toISOString(),
-        updated_at: new Date("2026-04-11T12:30:00Z").toISOString(),
-      },
-    ],
-  });
-}
+// --- MUTATIONS ---
 
 export function useAddSocialPost() {
+  const queryClient = useQueryClient();
+  const db = useFirestore(); // 3. USE THE HOOK
+
   return useMutation({
-    mutationFn: async (data: { post_url: string; platform: string }) => ({ id: 'new-post' }),
+    mutationFn: async (newPost: { post_url: string; platform: "instagram" | "linkedin"; }) => {
+      const socialPostsCollection = collection(db, "social_posts");
+      const platformQuery = query(socialPostsCollection, where("platform", "==", newPost.platform));
+      const snapshot = await getDocs(platformQuery);
+      const newPriority = snapshot.size + 1;
+
+      return await addDoc(socialPostsCollection, {
+        ...newPost,
+        created_at: new Date().toISOString(),
+        priority: newPriority,
+      });
+    },
+    onSuccess: async () => {
+      await revalidateSocialPosts();
+      await queryClient.invalidateQueries({ queryKey: ["social-posts"] });
+    },
   });
+}
+
+export function useUpdateSocialPost() {
+    const queryClient = useQueryClient();
+    const db = useFirestore(); // 3. USE THE HOOK
+
+    return useMutation({
+        mutationFn: async (variables: { id: string; post_url: string }) => {
+            const postDoc = doc(db, "social_posts", variables.id);
+            await updateDoc(postDoc, { post_url: variables.post_url });
+        },
+        onSuccess: async () => {
+            await revalidateSocialPosts();
+            await queryClient.invalidateQueries({ queryKey: ["social-posts"] });
+        },
+    });
 }
 
 export function useDeleteSocialPost() {
+    const queryClient = useQueryClient();
+    const db = useFirestore(); // 3. USE THE HOOK
+
+    return useMutation({
+        mutationFn: async (id: string) => {
+            await deleteDoc(doc(db, "social_posts", id));
+        },
+        onSuccess: async () => {
+            await revalidateSocialPosts();
+            await queryClient.invalidateQueries({ queryKey: ["social-posts"] });
+        },
+    });
+}
+
+export function useUpdateSocialPostOrder() {
+  const queryClient = useQueryClient();
+  const db = useFirestore(); // 3. USE THE HOOK
+
   return useMutation({
-    mutationFn: async (id: string) => ({ success: true }),
+    mutationFn: async (variables: { postIds: string[]; platform: "instagram" | "linkedin"; }) => {
+      const batch = writeBatch(db);
+      variables.postIds.forEach((id, index) => {
+        const docRef = doc(db, "social_posts", id);
+        batch.update(docRef, { priority: index + 1 });
+      });
+      await batch.commit();
+    },
+    onSuccess: async (_data, variables) => {
+      await revalidateSocialPosts();
+      await queryClient.invalidateQueries({ queryKey: ["social-posts"] });
+      
+      queryClient.setQueryData<SocialPostsByPlatform>(['social-posts'], (oldData) => {
+          if (!oldData) return { linkedin: [], instagram: [] };
+          const reorderedPosts = variables.postIds.map(id => 
+              [...oldData.linkedin, ...oldData.instagram].find(p => p.id === id)
+          ).filter((p): p is SocialPost => !!p);
+          
+          return {
+              ...oldData,
+              [variables.platform]: reorderedPosts
+          };
+      });
+    },
   });
 }

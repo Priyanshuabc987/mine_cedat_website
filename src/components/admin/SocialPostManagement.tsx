@@ -1,171 +1,195 @@
-import { useState } from 'react';
-import { useSocialPosts, useAddSocialPost, useDeleteSocialPost } from '@/hooks/useSocialPosts';
+
+"use client";
+
+import { useState, useEffect } from 'react';
+import { useSocialPosts, useAddSocialPost, useDeleteSocialPost, useUpdateSocialPostOrder, SocialPost } from "@/hooks/useSocialPosts";
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Delete, Plus, ExternalLink, Loader2 } from 'lucide-react';
+import { Delete, Plus, ExternalLink, Loader2, ChevronsUpDown, ArrowRight, X } from 'lucide-react';
+import { Reorder } from "framer-motion"
+
+function ReorderablePostList({ 
+    platform, 
+    posts, 
+    onDelete, 
+    onUpdateOrder 
+}: {
+    platform: 'linkedin' | 'instagram';
+    posts: SocialPost[];
+    onDelete: (id: string) => void;
+    onUpdateOrder: (platform: 'linkedin' | 'instagram', ids: string[]) => void;
+}) {
+    const [localPosts, setLocalPosts] = useState(posts);
+    const [isSaving, setIsSaving] = useState(false);
+
+    useEffect(() => {
+        setLocalPosts(posts);
+    }, [posts]);
+
+    const handleSaveOrder = async () => {
+        setIsSaving(true);
+        const postIds = localPosts.map(p => p.id);
+        await onUpdateOrder(platform, postIds);
+        setIsSaving(false);
+    };
+
+    const handleCancelOrder = () => {
+        setLocalPosts(posts);
+    };
+
+    const originalOrder = JSON.stringify(posts.map(p => p.id));
+    const currentOrder = JSON.stringify(localPosts.map(p => p.id));
+    const hasOrderChanged = originalOrder !== currentOrder;
+
+    return (
+        <Card>
+            <CardHeader className="flex-row items-center justify-between">
+                <CardTitle className="text-lg capitalize">{platform} Posts</CardTitle>
+                {hasOrderChanged && (
+                    <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="sm" onClick={handleCancelOrder} disabled={isSaving}>
+                            <X className="w-4 h-4 mr-2" />
+                            Cancel
+                        </Button>
+                        <Button size="sm" onClick={handleSaveOrder} disabled={isSaving}>
+                            {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin"/> : <ChevronsUpDown className="w-4 h-4 mr-2"/>}
+                            Save Order
+                        </Button>
+                    </div>
+                )}
+            </CardHeader>
+            <CardContent>
+                {localPosts.length > 0 ? (
+                    <Reorder.Group axis="y" values={localPosts} onReorder={setLocalPosts}>
+                        <div className="space-y-3">
+                            {localPosts.map((post, index) => {
+                                const originalPost = posts.find(p => p.id === post.id);
+                                const originalPriority = originalPost ? originalPost.priority : 'N/A';
+                                const newPriority = index + 1;
+                                const hasChanged = originalPriority !== newPriority;
+
+                                return (
+                                    <Reorder.Item key={post.id} value={post}>
+                                        <div className="flex items-center gap-3 p-4 rounded-lg border border-border/50 bg-card/50 cursor-grab active:cursor-grabbing">
+                                            <div className="flex items-center gap-2 text-sm font-mono text-muted-foreground">
+                                                 <span className="flex items-center justify-center w-8 h-8 rounded-full bg-black text-white font-bold">
+                                                    {originalPriority}
+                                                 </span>
+                                                {hasChanged && <ArrowRight className="w-4 h-4 text-primary" />}
+                                                <span className={hasChanged ? 'text-primary font-bold' : ''}>{newPriority}</span>
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm break-all text-muted-foreground line-clamp-1">{post.post_url}</p>
+                                            </div>
+                                            <div className="flex gap-2 flex-shrink-0">
+                                                <Button variant="outline" size="sm" asChild><a href={post.post_url} target="_blank" rel="noopener noreferrer"><ExternalLink className="w-4 h-4" /></a></Button>
+                                                <Button variant="destructive" size="sm" onClick={() => onDelete(post.id)}><Delete className="w-4 h-4" /></Button>
+                                            </div>
+                                        </div>
+                                    </Reorder.Item>
+                                );
+                            })}
+                        </div>
+                    </Reorder.Group>
+                ) : (
+                     <p className="text-center py-8 text-muted-foreground">No {platform} posts yet.</p>
+                )}
+            </CardContent>
+        </Card>
+    );
+}
 
 export function SocialPostManagement() {
-  const { toast } = useToast();
-  const { data: posts, isLoading } = useSocialPosts();
-  const addMutation = useAddSocialPost();
-  const deleteMutation = useDeleteSocialPost();
+    const { toast } = useToast();
+    const { data, isLoading } = useSocialPosts();
+    const addMutation = useAddSocialPost();
+    const deleteMutation = useDeleteSocialPost();
+    const updateOrderMutation = useUpdateSocialPostOrder();
 
-  const [postUrl, setPostUrl] = useState('');
-  const [platform, setPlatform] = useState<'instagram' | 'linkedin'>('instagram');
+    const [postUrl, setPostUrl] = useState('');
+    const [platform, setPlatform] = useState<'instagram' | 'linkedin'>('instagram');
 
-  const handleAddPost = async () => {
-    if (!postUrl.trim()) {
-      toast({ title: 'Error', description: 'Please enter a post URL', variant: 'destructive' });
-      return;
-    }
+    const handleAddPost = async () => {
+        if (!postUrl.trim()) {
+            toast({ title: 'Error', description: 'Post URL cannot be empty.', variant: 'destructive' });
+            return;
+        }
+        try {
+            await addMutation.mutateAsync({ post_url: postUrl, platform });
+            toast({ title: 'Success', description: 'Social post added.' });
+            setPostUrl('');
+        } catch (e) {
+            toast({ title: 'Error', description: 'Failed to add post.', variant: 'destructive' });
+        }
+    };
 
-    try {
-      await addMutation.mutateAsync({ post_url: postUrl, platform });
-      toast({ title: 'Success', description: 'Social post added!' });
-      setPostUrl('');
-      setPlatform('instagram');
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Failed to add post';
-      toast({ title: 'Error', description: msg, variant: 'destructive' });
-    }
-  };
+    const handleDeletePost = async (id: string) => {
+        if (window.confirm('Are you sure you want to delete this post?')) {
+            try {
+                await deleteMutation.mutateAsync(id);
+                toast({ title: 'Success', description: 'Social post deleted.' });
+            } catch (e) {
+                toast({ title: 'Error', description: 'Failed to delete post.', variant: 'destructive' });
+            }
+        }
+    };
 
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteMutation.mutateAsync(id);
-      toast({ title: 'Success', description: 'Social post deleted!' });
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Failed to delete post';
-      toast({ title: 'Error', description: msg, variant: 'destructive' });
-    }
-  };
+    const handleUpdateOrder = async (platform: 'linkedin' | 'instagram', postIds: string[]) => {
+        try {
+            await updateOrderMutation.mutateAsync({ platform, postIds });
+            toast({ title: 'Success', description: `${platform.charAt(0).toUpperCase() + platform.slice(1)} order updated!` });
+        } catch (e) {
+            toast({ title: 'Error', description: 'Failed to update order.', variant: 'destructive' });
+        }
+    };
 
-  return (
-    <div className="space-y-6">
-      <div className="text-left">
-        <h1 className="text-2xl sm:text-3xl font-display font-bold mb-2 break-words">Social Media Posts</h1>
-        <p className="text-sm sm:text-base text-muted-foreground break-words">
-          Add Instagram and LinkedIn post links to display on the home page. Posts will be embedded automatically.
-        </p>
-      </div>
-
-      {/* Add New Post */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Add New Social Post</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Platform</label>
-            <Select value={platform} onValueChange={(value) => setPlatform(value as 'instagram' | 'linkedin')}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="instagram">Instagram</SelectItem>
-                <SelectItem value="linkedin">LinkedIn</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Post URL</label>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Input
-                placeholder="e.g., https://www.instagram.com/p/ABC123/"
-                value={postUrl}
-                onChange={(e) => setPostUrl(e.target.value)}
-                className="flex-1"
-              />
-              <Button
-                onClick={handleAddPost}
-                disabled={addMutation.isPending}
-                className="w-full sm:w-auto"
-              >
-                {addMutation.isPending ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Adding...
-                  </>
-                ) : (
-                  <>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Post
-                  </>
-                )}
-              </Button>
+    return (
+        <div className="space-y-6">
+            <div className="text-left">
+                <h1 className="text-2xl sm:text-3xl font-display font-bold">Social Media Posts</h1>
+                <p className="text-sm sm:text-base text-muted-foreground">Add and reorder posts for the home page social feed.</p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              {platform === 'instagram'
-                ? 'Paste the full Instagram post URL (https://www.instagram.com/p/...)'
-                : 'Paste the full LinkedIn post URL or share link'}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
 
-      {/* Posts List */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Added Posts ({posts?.length || 0})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-            </div>
-          ) : posts && posts.length > 0 ? (
-            <div className="space-y-3">
-              {posts.map((post) => (
-                <div
-                  key={post.id}
-                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-lg border border-border/50 bg-card/50"
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-primary/10 text-primary capitalize">
-                        {post.platform}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        Added {new Date(post.created_at).toLocaleDateString()}
-                      </span>
+            <Card>
+                <CardHeader><CardTitle className="text-lg">Add New Post</CardTitle></CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium">Platform</label>
+                        <Select value={platform} onValueChange={(v) => setPlatform(v as any)}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="instagram">Instagram</SelectItem><SelectItem value="linkedin">LinkedIn</SelectItem></SelectContent></Select>
                     </div>
-                    <p className="text-sm break-all text-muted-foreground line-clamp-1">{post.post_url}</p>
-                  </div>
-                  <div className="flex gap-2 flex-shrink-0">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      asChild
-                      className="w-full sm:w-auto"
-                    >
-                      <a href={post.post_url} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        View
-                      </a>
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(post.id)}
-                      disabled={deleteMutation.isPending}
-                      className="w-full sm:w-auto"
-                    >
-                      <Delete className="w-4 h-4 mr-2" />
-                      Delete
-                    </Button>
-                  </div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium">Post URL</label>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                            <Input placeholder="Paste the full post URL" value={postUrl} onChange={(e) => setPostUrl(e.target.value)} className="flex-1"/>
+                            <Button onClick={handleAddPost} disabled={addMutation.isPending} className="w-full sm:w-auto">
+                                {addMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin"/> : <Plus className="w-4 h-4 mr-2"/>} Add Post
+                            </Button>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {isLoading ? (
+                <div className="text-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground mx-auto"/></div>
+            ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <ReorderablePostList 
+                        platform="linkedin"
+                        posts={data?.linkedin || []}
+                        onDelete={handleDeletePost}
+                        onUpdateOrder={handleUpdateOrder}
+                    />
+                    <ReorderablePostList 
+                        platform="instagram"
+                        posts={data?.instagram || []}
+                        onDelete={handleDeletePost}
+                        onUpdateOrder={handleUpdateOrder}
+                    />
                 </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-center py-8 text-muted-foreground">No social posts added yet</p>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  );
+            )}
+        </div>
+    );
 }

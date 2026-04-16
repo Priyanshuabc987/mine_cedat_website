@@ -49,14 +49,6 @@ export function AdminSidebar({ sections, activeSection, onSectionChange }: Admin
           })}
         </nav>
       </div>
-
-      {/* Footer - Hidden on mobile */}
-      <div className="hidden lg:block absolute bottom-0 left-0 right-0 p-6 border-t border-border bg-card">
-        <div className="text-xs text-muted-foreground">
-          <p>CEDAT Admin Dashboard</p>
-          <p className="mt-1">Manage your startup ecosystem</p>
-        </div>
-      </div>
     </div>
   );
 }
