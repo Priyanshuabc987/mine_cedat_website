@@ -5,6 +5,7 @@
 
 @layer base {
   :root {
+    
     --background: 210 20% 98%; /* Soft Neutral White */
     --foreground: 216 5% 21%; /* Dark Slate Gray */
     --card: 0 0% 100%;
@@ -53,8 +54,12 @@
   * {
     @apply border-border;
   }
+  html {
+    overflow-y: scroll;
+  }
   body {
     @apply bg-background text-foreground font-body;
+    overflow-y: scroll;
   }
 }
 

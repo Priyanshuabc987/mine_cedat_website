@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useForm, UseFormRegister, UseFormSetValue, UseFormWatch, FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -59,6 +59,26 @@ export function EventManagement() {
     resolver: zodResolver(eventSchema),
     defaultValues: { status: 'draft' },
   });
+
+  useEffect(() => {
+    const body = document.body;
+    const originalPaddingRight = body.style.paddingRight;
+    const originalOverflow = body.style.overflow;
+
+    if (isDialogOpen) {
+      const scrollbarWidth = window.innerWidth - body.clientWidth;
+      body.style.paddingRight = `${scrollbarWidth}px`;
+      body.style.overflow = 'hidden';
+    } else {
+      body.style.paddingRight = originalPaddingRight;
+      body.style.overflow = originalOverflow;
+    }
+
+    return () => {
+      body.style.paddingRight = originalPaddingRight;
+      body.style.overflow = originalOverflow;
+    };
+  }, [isDialogOpen]);
 
   const handleImageFileChange = (file: File | null) => {
     setImageFile(file);
