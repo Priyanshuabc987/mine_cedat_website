@@ -1,8 +1,8 @@
+
 // src/components/auth/LoginForm.tsx
 'use client';
 
 import { useAuth } from '@/hooks/useAuth';
-import { useAdmin } from '@/hooks/useAdmin';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -28,7 +28,6 @@ const formSchema = z.object({
 
 export function LoginForm() {
   const { login, isAuthenticated, isLoading: isAuthLoading, loginError } = useAuth();
-  const { isAdmin } = useAdmin();
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -36,16 +35,14 @@ export function LoginForm() {
     defaultValues: { email: '', password: '' },
   });
 
+  // Simplified redirection effect
   useEffect(() => {
+    // If authentication is successful, always redirect to the admin page.
+    // The useAuth hook now ensures that only admins can be authenticated.
     if (isAuthenticated) {
-      if (isAdmin) {
-        router.push('/admin');
-      } else {
-        // Redirect non-admins to a different page, e.g., their profile or home
-        router.push('/profile'); 
-      }
+      router.push('/admin');
     }
-  }, [isAuthenticated, isAdmin, router]);
+  }, [isAuthenticated, router]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     await login(values.email, values.password);
@@ -85,6 +82,7 @@ export function LoginForm() {
             />
              {loginError && (
               <Alert variant="destructive">
+                {/* The useAuth hook now provides a more specific error for non-admins */}
                 <AlertDescription>{(loginError as any).message || 'Login failed. Please check your credentials.'}</AlertDescription>
               </Alert>
             )}

@@ -2,7 +2,7 @@
 // src/hooks/useAuth.ts
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   getAuth, 
   signInWithEmailAndPassword, 
@@ -10,21 +10,33 @@ import {
   onAuthStateChanged,
   User as FirebaseUser 
 } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { useRouter } from 'next/navigation';
 import { useFirebaseApp } from '@/firebase/provider';
-import { db } from '@/firebase/config';
+import { User } from '@/lib/types';
 
-export interface User {
-  id: string;
-  email: string | null;
-  roles: string[];
-  full_name: string | null; // Add full_name to the interface
+// Key for session storage
+const USER_CACHE_KEY = 'app_user_cache';
+
+async function fetchUserFromServer(userId: string): Promise<User | null> {
+    try {
+        const response = await fetch(`/api/user/${userId}`);
+        if (!response.ok) {
+            // A 404 is not an error, it just means the user isn't in our DB.
+            if (response.status === 404) {
+                return null;
+            }
+            throw new Error('Failed to fetch user data');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching user from server:", error);
+        return null;
+    }
 }
 
 export function useAuth() {
-  // Server-side rendering check
   const isServer = typeof window === 'undefined';
-
+  const router = useRouter();
   const firebaseApp = !isServer ? useFirebaseApp() : null;
   const auth = firebaseApp ? getAuth(firebaseApp) : null;
   
@@ -33,38 +45,42 @@ export function useAuth() {
   const [isLoading, setIsLoading] = useState(true);
   const [loginError, setLoginError] = useState<Error | null>(null);
 
+  const handleUser = useCallback(async (firebaseUser: FirebaseUser | null) => {
+    if (firebaseUser) {
+      // On any auth change, always fetch from server to validate role.
+      const appUser = await fetchUserFromServer(firebaseUser.uid);
+
+      // User must exist in our DB and have the 'admin' role.
+      if (appUser && appUser.roles.includes('admin')) {
+        sessionStorage.setItem(USER_CACHE_KEY, JSON.stringify(appUser));
+        setUser(appUser);
+        setIsAuthenticated(true);
+        setIsLoading(false);
+      } else {
+        // If not an admin, force sign-out and set an error.
+        setLoginError(new Error("Access denied. Only administrators can log in."));
+        if (auth) {
+          await signOut(auth); // This triggers onAuthStateChanged again with null.
+        }
+        // State will be cleared by the subsequent onAuthStateChanged call.
+      }
+    } else {
+      // User is signed out.
+      sessionStorage.removeItem(USER_CACHE_KEY);
+      setUser(null);
+      setIsAuthenticated(false);
+      setIsLoading(false);
+    }
+  }, [auth]);
+
   useEffect(() => {
     if (!auth) {
       setIsLoading(false);
       return;
     }
-
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
-      if (firebaseUser) {
-        // User is signed in, fetch their data from Firestore
-        const userDocRef = doc(db, 'users', firebaseUser.uid);
-        const userDoc = await getDoc(userDocRef);
-        const userData = userDoc.data();
-
-        const appUser: User = {
-          id: firebaseUser.uid,
-          email: firebaseUser.email,
-          roles: userData?.roles || [],
-          full_name: userData?.full_name || null, // Fetch full_name
-        };
-        
-        setUser(appUser);
-        setIsAuthenticated(true);
-      } else {
-        // User is signed out
-        setUser(null);
-        setIsAuthenticated(false);
-      }
-      setIsLoading(false);
-    });
-
+    const unsubscribe = onAuthStateChanged(auth, handleUser);
     return () => unsubscribe();
-  }, [auth]);
+  }, [auth, handleUser]);
 
   const login = async (email: string, pass: string) => {
     if (!auth) return;
@@ -72,7 +88,9 @@ export function useAuth() {
     setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, pass);
+      // onAuthStateChanged now handles all validation and state changes.
     } catch (error) { 
+      // Catches Firebase errors like wrong password.
       setLoginError(error as Error);
       console.error("Login failed:", error);
       setIsLoading(false);
@@ -81,7 +99,9 @@ export function useAuth() {
 
   const logout = async () => {
     if (!auth) return;
+    sessionStorage.removeItem(USER_CACHE_KEY);
     await signOut(auth);
+    router.push('/'); // Redirect to home page after logout
   };
 
   return { user, isAuthenticated, isLoading, login, logout, loginError };

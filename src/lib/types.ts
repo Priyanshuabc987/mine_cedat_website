@@ -2,6 +2,16 @@
 // This file defines shared data structures and types used across the application.
 
 /**
+ * Represents an authenticated user in the application.
+ */
+export interface User {
+  id: string;
+  email: string | null;
+  roles: string[];
+  full_name: string | null;
+}
+
+/**
  * Represents a single item in the gallery.
  * This type is used in both the Firestore hooks and the React components.
  */
