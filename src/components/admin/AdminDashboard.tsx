@@ -1,14 +1,16 @@
+"use client";
+
 import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { EventManagement } from '@/components/admin/EventManagement';
 import { Card, CardContent } from '@/components/ui/card';
 import { generateSEO, seoConfigs } from '@/lib/seo';
-import { Calendar, BarChart3, Images, Star, FileText } from 'lucide-react';
+import { Calendar, Images, FileText } from 'lucide-react';
 import { GalleryManagement } from '@/components/admin/GalleryManagement';
 // import { FICManagement } from '@/components/admin/FICManagement';
 import { HeroManagement } from '@/components/admin/HeroManagement';
-import { ContentManagement } from '@/components/admin/ContentManagement';
+// import { ContentManagement } from '@/components/admin/ContentManagement';
 import { SocialPostManagement } from '@/components/admin/SocialPostManagement';
 
 export const adminSections = [

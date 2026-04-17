@@ -1,3 +1,4 @@
+
 // src/hooks/useAuth.ts
 "use client";
 
@@ -21,8 +22,11 @@ export interface User {
 }
 
 export function useAuth() {
-  const firebaseApp = useFirebaseApp();
-  const auth = getAuth(firebaseApp);
+  // Server-side rendering check
+  const isServer = typeof window === 'undefined';
+
+  const firebaseApp = !isServer ? useFirebaseApp() : null;
+  const auth = firebaseApp ? getAuth(firebaseApp) : null;
   
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -30,6 +34,11 @@ export function useAuth() {
   const [loginError, setLoginError] = useState<Error | null>(null);
 
   useEffect(() => {
+    if (!auth) {
+      setIsLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
       if (firebaseUser) {
         // User is signed in, fetch their data from Firestore
@@ -58,6 +67,7 @@ export function useAuth() {
   }, [auth]);
 
   const login = async (email: string, pass: string) => {
+    if (!auth) return;
     setLoginError(null);
     setIsLoading(true);
     try {
@@ -70,6 +80,7 @@ export function useAuth() {
   };
 
   const logout = async () => {
+    if (!auth) return;
     await signOut(auth);
   };
 
