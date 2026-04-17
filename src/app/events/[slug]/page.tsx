@@ -21,7 +21,8 @@ interface EventDetailPageProps {
 }
 
 export async function generateMetadata({ params }: EventDetailPageProps): Promise<Metadata> {
-  const event = await getEventBySlug(params.slug);
+  const resolvedparmas = await params;
+  const event = await getEventBySlug(resolvedparmas.slug);
   if (!event) {
     return { title: "Event Not Found" };
   }
@@ -60,7 +61,8 @@ export async function generateMetadata({ params }: EventDetailPageProps): Promis
 }
 
 export default async function EventDetailPage({ params }: EventDetailPageProps) {
-  const event = await getEventBySlug(params.slug);
+  const resolvedparmas = await params;
+  const event = await getEventBySlug(resolvedparmas.slug);
 
   if (!event) {
     notFound();
@@ -68,7 +70,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
 
   const allPublishedEvents = await getEvents({
     status_filter: 'published',
-    page_size: 7
+    page_size: 6
   });
 
   const otherEvents = allPublishedEvents.filter(e => e.id !== event.id).slice(0, 6);
@@ -130,14 +132,14 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
   };
 
   return (
-    <div className="min-h-screen bg-background pt-24 sm:pt-32 pb-20">
+    <div className="min-h-screen bg-background pt-16 sm:pt-32 pb-20">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
-            <Link href="/events" className='mb-8 inline-block'>
+            <Link href="/events" className='mb-2 md:mb-8 inline-block'>
               <Button variant="ghost" size="sm">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Events
@@ -146,8 +148,8 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
             <EventDetailView event={event} layout="centered" />
 
             {otherEvents.length > 0 && (
-              <div className="mt-20">
-                <h2 className="text-3xl font-bold text-primary tracking-tight mb-10">
+              <div className="mt-6 md:mt-10">
+                <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-10">
                   Other Upcoming Events in Bangalore
                 </h2>
                 <StaticEventList events={otherEvents} />
