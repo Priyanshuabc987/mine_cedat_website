@@ -4,19 +4,69 @@ import { EventListClient } from "@/components/events/EventListClient";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { Metadata } from 'next';
+import { BASE_URL, LOGO_URL } from '@/lib/constants';
 
-// This page is now a Server Component, responsible for fetching initial data.
+export const metadata: Metadata = {
+  title: "Startup Events in Bangalore - Cedat",
+  description: "Browse upcoming startup meetups, workshops, and networking events in Bangalore. Join the Cedat community and connect with fellow innovators.",
+  openGraph: {
+    title: "Startup Events in Bangalore - Cedat",
+    description: "Browse upcoming startup meetups, workshops, and networking events in Bangalore. Join the Cedat community and connect with fellow innovators.",
+    url: `${BASE_URL}/events`,
+    siteName: 'Cedat',
+    images: [
+      {
+        url: LOGO_URL,
+        width: 1200,
+        height: 630,
+        alt: 'Cedat Events',
+      },
+    ],
+    type: 'website',
+  },
+   twitter: {
+      card: 'summary_large_image',
+      title: "Startup Events in Bangalore - Cedat",
+      description: "Browse upcoming startup meetups, workshops, and networking events in Bangalore. Join the Cedat community and connect with fellow innovators.",
+      images: [LOGO_URL],
+      creator: '@cedat_org',
+    },
+};
+
+
 export default async function EventsPage() {
   
-  // Fetch the initial batch of published events directly on the server.
-  // This ensures the data is present in the initial HTML for SEO.
   const initialEvents = await getEvents({
     status_filter: 'published',
-    page_size: 6 // A reasonable initial page size
+    page_size: 6 
   });
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": BASE_URL
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Events",
+        "item": `${BASE_URL}/events`
+      }
+    ]
+  };
 
   return (
     <div className="min-h-screen bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
       <main className="pt-32 pb-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <Link href="/">
@@ -35,10 +85,6 @@ export default async function EventsPage() {
             </p>
           </div>
 
-          {/* 
-            The client component receives the server-fetched data as an initial prop.
-            It will then handle all client-side logic, like fetching more events.
-          */}
           <EventListClient initialEvents={initialEvents} statusFilter="published" />
 
         </div>

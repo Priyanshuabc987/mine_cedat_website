@@ -1,24 +1,70 @@
 
 import { getGalleryPhotos, getGalleryVideos } from "@/lib/data/gallery";
 import { GalleryPageClient } from "@/components/gallery/GalleryPageClient";
-import { generateSEO, seoConfigs } from "@/lib/seo";
 import { Metadata } from "next";
+import { BASE_URL, LOGO_URL } from "@/lib/constants";
 
-// Generate SEO metadata for the page, providing a fallback for the null case.
-export const metadata: Metadata = generateSEO(seoConfigs.gallery) || {};
+export const metadata: Metadata = {
+  title: "Event Gallery - Photos of Bangalore's Startup and Tech Community",
+  description: "Explore photos from Cedat's vibrant events. See the energy of our startup meetups, workshops, and networking sessions. A glimpse into the heart of Bangalore's tech ecosystem.",
+  openGraph: {
+    title: "Event Gallery - Cedat",
+    description: "Explore photos from Cedat's vibrant events and see the energy of our startup community.",
+    url: `${BASE_URL}/gallery`,
+    siteName: 'Cedat',
+    images: [
+      {
+        url: LOGO_URL,
+        width: 1200,
+        height: 630,
+        alt: 'Cedat Event Gallery',
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Event Gallery - Cedat",
+    description: "Explore photos from Cedat's vibrant events and see the energy of our startup community.",
+    images: [LOGO_URL],
+    creator: '@cedat_org',
+  },
+};
 
-/**
- * This is the main Server Component for the /gallery page.
- * It is responsible for fetching the initial data and passing it to a client component.
- */
+
 export default async function GalleryPage() {
-  // Fetch photos and videos in parallel for maximum efficiency.
-  // This uses the cached data-fetching functions from /lib/data/gallery.ts
   const [photos, videos] = await Promise.all([
     getGalleryPhotos(),
     getGalleryVideos(),
   ]);
 
-  // Render the client component and pass the fetched data as props.
-  return <GalleryPageClient photos={photos} videos={videos} />;
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": BASE_URL
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Gallery",
+        "item": `${BASE_URL}/gallery`
+      }
+    ]
+  };
+
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <GalleryPageClient photos={photos} videos={videos} />
+    </>
+  );
 }

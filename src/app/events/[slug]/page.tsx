@@ -5,7 +5,9 @@ import { notFound } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { StaticEventList } from "@/components/events/StaticEventList"; // FIX: Import the new static component
+import { StaticEventList } from "@/components/events/StaticEventList";
+import type { Metadata } from 'next';
+import { BASE_URL, LOGO_URL } from "@/lib/constants";
 
 export async function generateStaticParams() {
   const events = await getEvents({ status_filter: 'published' });
@@ -18,25 +20,121 @@ interface EventDetailPageProps {
   params: { slug: string };
 }
 
-export default async function EventDetailPage({ params }: EventDetailPageProps) {  const resolvedparamms = await params;
-  // The slug from params is now guaranteed to exist by generateStaticParams
-  const event = await getEventBySlug(resolvedparamms.slug);
+export async function generateMetadata({ params }: EventDetailPageProps): Promise<Metadata> {
+  const event = await getEventBySlug(params.slug);
+  if (!event) {
+    return { title: "Event Not Found" };
+  }
+
+  const pageTitle = `${event.title} - Cedat: Bangalore Startup Event`;
+  const pageDescription = `Join us for ${event.title}, a premier event for the Bangalore startup ecosystem. ${event.description?.substring(0, 120)}...`;
+  const imageUrl = event.featured_image_url || LOGO_URL;
+  const pageUrl = `${BASE_URL}/events/${event.slug}`;
+
+  return {
+    title: pageTitle,
+    description: pageDescription,
+    openGraph: {
+      title: pageTitle,
+      description: pageDescription,
+      url: pageUrl,
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: event.title,
+        },
+      ],
+      type: 'article',
+      siteName: 'Cedat',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: pageTitle,
+      description: pageDescription,
+      images: [imageUrl],
+      creator: '@cedat_org',
+    },
+  };
+}
+
+export default async function EventDetailPage({ params }: EventDetailPageProps) {
+  const event = await getEventBySlug(params.slug);
 
   if (!event) {
     notFound();
   }
 
-  // Fetch all published events to find others
   const allPublishedEvents = await getEvents({
     status_filter: 'published',
-    page_size: 7 // Fetch a few extra to ensure we have 6 after filtering
+    page_size: 7
   });
 
-  // Filter out the current event and limit the list
   const otherEvents = allPublishedEvents.filter(e => e.id !== event.id).slice(0, 6);
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Event",
+        "name": event.title,
+        "startDate": `${event.event_date}T${event.start_time}`,
+        "endDate": `${event.event_date}T${event.end_time}`,
+        "eventStatus": event.status === 'cancelled' ? "https://schema.org/EventCancelled" : "https://schema.org/EventScheduled",
+        "eventAttendanceMode": "https://schema.org/MixedEventAttendanceMode",
+        "location": {
+            "@type": "Place",
+            "name": event.location || "Bangalore",
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": event.location || "Bangalore",
+                "addressLocality": "Bangalore",
+                "addressRegion": "KA",
+                "postalCode": "560001",
+                "addressCountry": "IN"
+            }
+        },
+        "image": [event.featured_image_url || ""],
+        "description": event.description || "",
+        "organizer": {
+            "@type": "Organization",
+            "name": "Cedat",
+            "url": BASE_URL
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": BASE_URL
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Events",
+            "item": `${BASE_URL}/events`
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": event.title,
+            "item": `${BASE_URL}/events/${event.slug}`
+          }
+        ]
+      }
+    ]
+  };
 
   return (
     <div className="min-h-screen bg-background pt-24 sm:pt-32 pb-20">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
             <Link href="/events" className='mb-8 inline-block'>
@@ -47,11 +145,10 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
             </Link>
             <EventDetailView event={event} layout="centered" />
 
-            {/* FIX: Use the new StaticEventList component */}
             {otherEvents.length > 0 && (
               <div className="mt-20">
                 <h2 className="text-3xl font-bold text-primary tracking-tight mb-10">
-                  Other Upcoming Events
+                  Other Upcoming Events in Bangalore
                 </h2>
                 <StaticEventList events={otherEvents} />
               </div>

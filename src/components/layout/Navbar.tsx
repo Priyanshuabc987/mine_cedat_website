@@ -46,12 +46,12 @@ export function Navbar() {
     <nav className={cn(
       "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
       isSolid
-        ? "bg-white/95 backdrop-blur-md  border-border/40 h-20  shadow-sm"
-        : "bg-transparent h-20 "
+        ? "bg-white/95 backdrop-blur-md  border-border/40 h-14 md:h-20  shadow-sm"
+        : "bg-transparent h-14 md:h-18 "
     )}>
       <div className="container mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative w-28 h-20 sm:w-46 sm:h-16 overflow-hidden rounded-xl flex items-center justify-center transition-transform group-hover:scale-105">
+          <div className="relative w-24 h-16 sm:w-32 sm:h-20 overflow-hidden rounded-xl flex items-center justify-center transition-transform group-hover:scale-105">
             <img src="/logo/cedat-logo.png" alt="CEDAT" className="w-full h-full object-contain" />
           </div>
         </Link>

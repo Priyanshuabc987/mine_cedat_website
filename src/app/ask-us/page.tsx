@@ -1,43 +1,62 @@
 
-"use client";
+import { Metadata } from 'next';
+import { BASE_URL, LOGO_URL } from '@/lib/constants';
+import { AskUsClient } from './AskUsClient';
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageCircle, ExternalLink } from "lucide-react";
-import Link from "next/link";
+export const metadata: Metadata = {
+  title: "Ask the Cedat Community | Bangalore Startup Help & Support",
+  description: "Have a question about the Bangalore startup ecosystem? Need help with your startup idea? Ask the Cedat community. We're here to support you with resources, connections, and advice.",
+  openGraph: {
+    title: "Ask the Cedat Community | Bangalore Startup Help & Support",
+    description: "Get support and answers from the Cedat community. We're here to help you on your startup journey.",
+    url: `${BASE_URL}/ask-us`,
+    siteName: 'Cedat',
+    images: [
+      {
+        url: LOGO_URL,
+        width: 1200,
+        height: 630,
+        alt: 'Ask the Cedat Community',
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Ask the Cedat Community | Bangalore Startup Help & Support",
+    description: "Get support and answers from the Cedat community. We're here to help you on your startup journey.",
+    images: [LOGO_URL],
+    creator: '@cedat_org',
+  },
+};
 
 export default function AskUsPage() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": BASE_URL
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Ask Us",
+        "item": `${BASE_URL}/ask-us`
+      }
+    ]
+  };
+
   return (
-    <div className="min-h-screen bg-background pt-32 pb-20">
-      <div className="container mx-auto px-4">
-        <div className="max-w-2xl mx-auto text-center space-y-12">
-          <div className="space-y-4">
-            <h1 className="text-4xl sm:text-6xl font-black tracking-tight">Ask <span className="text-primary italic">Us</span></h1>
-            <p className="text-lg text-muted-foreground">For any requirement or help from the community, please fill this form.</p>
-          </div>
-
-          <Card className="rounded-[2.5rem] border-none shadow-xl bg-white p-8 sm:p-12">
-            <CardHeader className="text-center space-y-4">
-              <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto text-primary">
-                <MessageCircle className="w-10 h-10" />
-              </div>
-              <CardTitle className="text-2xl font-black">Submit Inquiry</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-8">
-              <p className="text-muted-foreground">
-                We're here to help you navigate the ecosystem. Click the button below to submit your inquiry via our official form.
-              </p>
-              <Link href="https://form.svhrt.com/69de46f81fdb9c954fb903dd" target="_blank" rel="noopener noreferrer">
-                <Button size="lg" className="w-full rounded-full h-16 font-black text-lg bg-primary hover:bg-accent/90 group">
-                  Open Official Form
-                  <ExternalLink className="ml-2 w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                </Button>
-              </Link>
-
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <AskUsClient />
+    </>
   );
 }
