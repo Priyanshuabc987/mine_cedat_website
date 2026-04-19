@@ -132,7 +132,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
   };
 
   return (
-    <div className="min-h-screen bg-background pt-16 sm:pt-32 pb-20">
+    <div className="min-h-screen bg-background pt-20 sm:pt-32 pb-20">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

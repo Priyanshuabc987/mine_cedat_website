@@ -46,11 +46,18 @@ export function EventDetailCard({ event, className }: EventDetailCardProps) {
 
   return (
     <Card className={`relative overflow-hidden rounded-2xl border-0 bg-gradient-to-br from-card to-muted/30 shadow-2xl shadow-primary/10 ${className}`}>
-      <div className="absolute top-0 right-6 z-10 translate-x-1/5 translate-y-1/3">
-        <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-blue-600 font-bold text-primary-foreground text-center text-sm leading-tight shadow-xl">
-          Free<br />Entry
-        </div>
-      </div>
+      <div className="absolute top-2 right-6 z-10 translate-x-1/5 translate-y-1/5">
+  {/* Changed rounded-full to rounded-xl and updated gradient to Gold colors */}
+  <div className="flex h-12 w-28 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-300 via-yellow-500 to-amber-600 p-[2px] shadow-lg">
+    {/* Inner container to create a nice border effect and hold the text */}
+    <div className="flex h-full w-full items-center justify-center rounded-[10px] bg-gradient-to-br from-amber-400 to-yellow-600 px-3 py-1 shadow-inner">
+      <span className="text-sm font-black uppercase tracking-wider text-white drop-shadow-md">
+        Free Entry
+      </span>
+    </div>
+  </div>
+</div>
+
 
       <CardHeader className="border-b border-border/50 p-5 bg-gradient-to-b from-primary/10 to-transparent">
         <CardTitle>Event Details</CardTitle>
@@ -79,7 +86,7 @@ export function EventDetailCard({ event, className }: EventDetailCardProps) {
               <MapPin className="h-5 w-5 mt-0.5 flex-shrink-0 text-primary" />
               <div>
                 <p className="text-xs font-semibold text-muted-foreground">Location</p>
-                <p className="text-sm font-medium text-foreground/90 break-words">{event.location}</p>
+                <p className="text-sm font-semibold text-foreground/90 break-words">{event.location}</p>
               </div>
             </div>
           )}

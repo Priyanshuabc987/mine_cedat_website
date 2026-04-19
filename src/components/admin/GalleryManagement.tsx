@@ -1,7 +1,7 @@
 
 import { useMemo, useRef, useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
-import { useDeleteGalleryImage, useGalleryImages, useUpdateGalleryOrder, useUploadGalleryImages } from '@/hooks/useGallery';
+import { useDeleteGalleryImage, useGalleryImages, useUpdateGalleryOrder, useAddGalleryItem } from '@/hooks/useGallery';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { Delete, Upload, GripVertical, Loader2, Save } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { GalleryItem } from '@/lib/types';
+import { extractLinkedInID } from '@/lib/utils';
 
 function DraggableGridItem({ item, index, onDelete }: { item: GalleryItem; index: number; onDelete: () => void; }) {
   return (
@@ -18,50 +19,56 @@ function DraggableGridItem({ item, index, onDelete }: { item: GalleryItem; index
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
-          // Centers the 50% width box within the grid column
-          className="w-full md:w-[calc(33.33%-1rem)] justify-center py-2 group"
+          className={`
+            py-2 group flex justify-center
+            /* Photo: 3 columns | Video: 2 columns on desktop, 1 on mobile */
+            ${item.type === 'photo' 
+              ? 'w-full md:w-[calc(33.33%-1rem)]' 
+              : 'w-full md:w-[calc(50%-1rem)] lg:max-w-[400px]'} 
+          `}
         >
-          {/* w-1/2 + aspect-square = 50% width and 50% height of the parent width */}
-          <div className={`relative w-[70%] aspect-[7/5] rounded-lg overflow-hidden border-2 transition-all ${
-            snapshot.isDragging ? 'border-primary shadow-2xl scale-110 z-50' : 'border-transparent'
+          <div className={`relative w-full rounded-lg overflow-hidden border-2 transition-all ${
+            snapshot.isDragging ? 'border-primary shadow-2xl scale-105 z-50' : 'border-transparent'
+          } ${
+            /* Forces the 16:9 ratio regardless of width */
+            item.type === 'photo' ? 'aspect-[7/5]' : 'aspect-video'
           }`}>
-            <ImageWithFallback
-              src={item.url}
-              alt={item.caption || `Gallery item ${index + 1}`}
-              fill
-              className="object-cover"
-            />
             
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-            
-            {/* Smaller index badge for the smaller image */}
-            <span className="absolute bottom-1 left-2 text-white font-bold text-sm drop-shadow-md">
-              {index + 1}
-            </span>
+            {item.type === 'photo' ? (
+              <ImageWithFallback
+                src={item.url}
+                alt={item.caption || `Gallery item ${index + 1}`}
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <div className=" bg-slate-100">
+                <iframe
+                  src={`https://www.linkedin.com/embed/feed/update/${extractLinkedInID(item.url)}?compact=1`}
+                  className="absolute inset-0 w-full h-full border-none"
+                  frameBorder="0"
+                  allowFullScreen
+                  title={`LinkedIn post ${item.id}`}
+                />
+              </div>
+            )}
 
-            {/* Delete Button - Scaled down */}
-            <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button 
-                  variant="destructive" 
-                  size="icon" 
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevents drag triggers on click
-                    onDelete();
-                  }} 
-                  className="h-6 w-6"
-                >
-                  <Delete className="h-3 w-3" />
+            {/* Overlays (Buttons/Grip) */}
+            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            
+            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-30">
+                <Button variant="destructive" size="icon" onClick={(e) => { e.stopPropagation(); onDelete(); }} className="h-8 w-8">
+                  <Delete className="h-4 w-4" />
                 </Button>
             </div>
 
-            {/* Drag Handle - Scaled down */}
-            <div 
-              {...provided.dragHandleProps} 
-              className="absolute top-1 left-1 cursor-grab p-1 rounded-md bg-background/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              <GripVertical className="h-4 w-4 text-foreground/80" />
+            <div {...provided.dragHandleProps} className="absolute top-2 left-2 cursor-grab p-1.5 rounded-md bg-background/90 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-30">
+              <GripVertical className="h-4 w-4 text-foreground" />
             </div>
+            
+            <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/50 text-white text-xs font-bold backdrop-blur-sm">
+              {index + 1}
+            </span>
           </div>
         </div>
       )}
@@ -70,13 +77,15 @@ function DraggableGridItem({ item, index, onDelete }: { item: GalleryItem; index
 }
 
 
+
 export function GalleryManagement() {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [uploadType, setUploadType] = useState<'photo' | 'video'>('photo');
+  const [linkedinUrl, setLinkedinUrl] = useState('');
 
   const { data: allItems, isLoading } = useGalleryImages();
-  const uploadMutation = useUploadGalleryImages();
+  const addGalleryItemMutation = useAddGalleryItem();
   const deleteMutation = useDeleteGalleryImage();
   const updateOrderMutation = useUpdateGalleryOrder();
 
@@ -91,22 +100,50 @@ export function GalleryManagement() {
     setOrderedVideos(sortedVideos);
   }, [sortedPhotos, sortedVideos]);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined' && orderedVideos.length > 0) {
+        if ((window as any).IN) {
+            (window as any).IN.parse();
+        } else {
+            const script = document.createElement("script");
+            script.src = "https://platform.linkedin.com/in.js";
+            script.async = true;
+            script.defer = true;
+            script.onload = () => (window as any).IN.parse();
+            document.body.appendChild(script);
+        }
+    }
+  }, [orderedVideos]);
+
   const isOrderChanged = useMemo(() => {
     const photosChanged = JSON.stringify(sortedPhotos.map(p => p.id)) !== JSON.stringify(orderedPhotos.map(p => p.id));
     const videosChanged = JSON.stringify(sortedVideos.map(v => v.id)) !== JSON.stringify(orderedVideos.map(v => v.id));
     return photosChanged || videosChanged;
   }, [sortedPhotos, sortedVideos, orderedPhotos, orderedVideos]);
 
-  const handleFileUpload = async () => {
-    const file = fileInputRef.current?.files?.[0];
-    if (!file) {
-      toast({ title: 'No file selected', description: 'Please choose a file to upload.', variant: 'destructive' });
-      return;
+  const handleUpload = async () => {
+    if (uploadType === 'video') {
+      if (!linkedinUrl) {
+        toast({ title: 'No URL provided', description: 'Please enter a LinkedIn URL.', variant: 'destructive' });
+        return;
+      }
+      addGalleryItemMutation.mutate({ type: 'video', url: linkedinUrl }, {
+          onSuccess: () => {
+            toast({ title: 'Upload Successful', description: 'Your video has been added.' });
+            setLinkedinUrl('');
+          }
+      });
+    } else {
+      const file = fileInputRef.current?.files?.[0];
+      if (!file) {
+        toast({ title: 'No file selected', description: 'Please choose a file to upload.', variant: 'destructive' });
+        return;
+      }
+      addGalleryItemMutation.mutate({ type: 'photo', file }, {
+          onSuccess: () => toast({ title: 'Upload Successful', description: `Your photo has been added.` })
+      });
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
-    uploadMutation.mutate({ file, type: uploadType }, {
-        onSuccess: () => toast({ title: 'Upload Successful', description: `Your ${uploadType} has been added.` })
-    });
-    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleDelete = (item: GalleryItem) => {
@@ -119,16 +156,10 @@ export function GalleryManagement() {
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
-
-    if (!destination || source.droppableId !== destination.droppableId) {
-      return;
-    }
-    
+    if (!destination || source.droppableId !== destination.droppableId) return;
     const droppableId = destination.droppableId;
-
     const listToUpdate = droppableId === 'photos' ? orderedPhotos : orderedVideos;
     const listUpdater = droppableId === 'photos' ? setOrderedPhotos : setOrderedVideos;
-
     const items = Array.from(listToUpdate);
     const [reorderedItem] = items.splice(source.index, 1);
     items.splice(destination.index, 0, reorderedItem);
@@ -156,7 +187,7 @@ export function GalleryManagement() {
         ) : (
             <Droppable droppableId={type} direction="horizontal">
               {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef} className="flex flex-wrap gap-4 gap-4 px-auto">
+                <div {...provided.droppableProps} ref={provided.innerRef} className="flex flex-wrap gap-4">
                   {items.map((item, index) => (
                       <DraggableGridItem key={item.id} item={item} index={index} onDelete={() => handleDelete(item)} />
                   ))}
@@ -173,7 +204,18 @@ export function GalleryManagement() {
       <Card>
           <CardHeader><CardTitle>Upload New Gallery Item</CardTitle></CardHeader>
           <CardContent className="flex flex-col sm:flex-row gap-4">
-              <Input type="file" ref={fileInputRef} className="max-w-xs" />
+              {uploadType === 'photo' ? (
+                <Input key="photo-upload" type="file" ref={fileInputRef} className="max-w-xs" />
+              ) : (
+                <Input 
+                  key="video-upload"
+                  type="text" 
+                  placeholder="Enter LinkedIn URL" 
+                  value={linkedinUrl || ''} 
+                  onChange={(e) => setLinkedinUrl(e.target.value)} 
+                  className="max-w-xs" 
+                />
+              )}
               <Select value={uploadType} onValueChange={(value: 'photo' | 'video') => setUploadType(value)}>
                   <SelectTrigger className="w-[180px]"><SelectValue placeholder="Select type" /></SelectTrigger>
                   <SelectContent>
@@ -181,8 +223,8 @@ export function GalleryManagement() {
                       <SelectItem value="video">Video</SelectItem>
                   </SelectContent>
               </Select>
-              <Button onClick={handleFileUpload} disabled={uploadMutation.isPending}>
-                  {uploadMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+              <Button onClick={handleUpload} disabled={addGalleryItemMutation.isPending}>
+                  {addGalleryItemMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
                   Upload
               </Button>
           </CardContent>

@@ -45,7 +45,7 @@ export function useEvents({
 
   const fetchEvents = async (context: QueryFunctionContext): Promise<EventsPage> => {
     const pageParam = context.pageParam as QueryDocumentSnapshot | null;
-    const constraints: QueryConstraint[] = [orderBy('event_date', 'desc'), limit(pageSize)];
+    const constraints: QueryConstraint[] = [orderBy('event_date', 'asc'), limit(pageSize)];
     if (status_filter) {
       constraints.push(where('status', '==', status_filter));
     }

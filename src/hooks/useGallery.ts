@@ -6,9 +6,14 @@ import { collection, query, orderBy, doc, deleteDoc, addDoc, serverTimestamp, ge
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { uploadToCloudinary } from '@/lib/cloudinary';
 import { GalleryItem } from '@/lib/types';
-import { revalidateGalleryPhotos, revalidateGalleryVideos } from '@/lib/actions/revalidate'; // Import the server actions
+import { revalidateGalleryPhotos, revalidateGalleryVideos } from '@/lib/actions/revalidate';
 
-// Hook to fetch all gallery images, ordered by their display_order
+// Type for the mutation input, which can be a photo file or a video URL
+type AddGalleryItemInput =
+  | { type: 'photo'; file: File }
+  | { type: 'video'; url: string };
+
+// Hook to fetch all gallery items, ordered by their display_order
 export function useGalleryImages() {
   const db = useFirestore();
   const galleryRef = collection(db, 'gallery');
@@ -23,31 +28,37 @@ export function useGalleryImages() {
   });
 }
 
-// Hook to upload new gallery images
-export function useUploadGalleryImages() {
+// Hook to add a new gallery item (photo or video)
+export function useAddGalleryItem() {
     const queryClient = useQueryClient();
     const db = useFirestore();
 
     return useMutation({
-        mutationFn: async ({ file, type }: { file: File, type: 'photo' | 'video' }) => {
+        mutationFn: async (input: AddGalleryItemInput) => {
             const galleryRef = collection(db, 'gallery');
             const snapshot = await getDocs(galleryRef);
             const currentCount = snapshot.size;
-            const imageUrl = await uploadToCloudinary(file);
+
+            let itemUrl: string;
+            if (input.type === 'photo') {
+                itemUrl = await uploadToCloudinary(input.file);
+            } else { // type is 'video'
+                itemUrl = input.url;
+            }
 
             await addDoc(galleryRef, {
-                url: imageUrl,
-                type: type,
+                url: itemUrl,
+                type: input.type,
                 display_order: currentCount + 1,
                 createdAt: serverTimestamp(),
             });
-            return type; // Return the type for the onSuccess callback
+            return input.type; // Return the type for the onSuccess callback
         },
         onSuccess: async (type) => {
-            // First, invalidate the admin panel's cache to show the new item
+            // Invalidate the admin panel's cache
             await queryClient.invalidateQueries({ queryKey: ['galleryImages'] });
 
-            // Next, revalidate the public-facing gallery page cache
+            // Revalidate the public-facing gallery page cache
             if (type === 'photo') {
                 await revalidateGalleryPhotos();
             } else {
@@ -66,11 +77,10 @@ export function useDeleteGalleryImage() {
         mutationFn: async ({ id, url, type }: { id: string, url: string, type: 'photo' | 'video' }) => {
             // Note: Add logic here to delete from Cloudinary if needed
             await deleteDoc(doc(db, 'gallery', id));
-            return type; // Return the type for the onSuccess callback
+            return type;
         },
         onSuccess: async (type) => {
             await queryClient.invalidateQueries({ queryKey: ['galleryImages'] });
-
             if (type === 'photo') {
                 await revalidateGalleryPhotos();
             } else {
@@ -96,9 +106,6 @@ export function useUpdateGalleryOrder() {
         },
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ['galleryImages'] });
-
-            // When order changes, both photos and videos might be affected.
-            // It's safest to revalidate both.
             await Promise.all([
                 revalidateGalleryPhotos(),
                 revalidateGalleryVideos(),

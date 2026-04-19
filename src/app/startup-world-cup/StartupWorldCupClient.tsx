@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Users, Mic2,Zap } from "lucide-react";
 import Link from "next/link";
+import { AnimatedCounter } from "@/components/shared/AnimatedCounter";
 
 const SWC_LOGO_SRC = "https://static.wixstatic.com/media/9a1d63_ab519186f938416c8846e0010be6186d~mv2_d_2001_2457_s_2.png";
 
@@ -48,21 +49,29 @@ export function StartupWorldCupClient() {
           transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
           className="relative z-20 w-full container mx-auto px-4 sm:px-6 pb-10"
         >
-          <div className=" rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl  flex flex-wrap justify-between gap-6 text-center">
+          <div className=" rounded-2xl sm:rounded-3xl p-6 sm:p-8 flex flex-wrap justify-between gap-6 text-center">
               <div className="flex-1 min-w-[120px]">
-                <div className="text-3xl sm:text-4xl font-black text-white">$1M</div>
+                <div className="text-3xl sm:text-4xl font-black text-white">
+                  <AnimatedCounter to={1000000} format={(n) => `$${Math.round(n / 1000000)}M`} />
+                </div>
                 <div className="text-xs font-bold text-white uppercase tracking-widest mt-1">Investment Prize</div>
               </div>
               <div className="flex-1 min-w-[120px]">
-                <div className="text-3xl sm:text-4xl font-black text-white">50K+</div>
+                <div className="text-3xl sm:text-4xl font-black text-white">
+                  <AnimatedCounter to={50000} format={(n) => `${Math.round(n / 1000)}K+`} />
+                </div>
                 <div className="text-xs font-bold text-white uppercase tracking-widest mt-1">Attendees</div>
               </div>
               <div className="flex-1 min-w-[120px]">
-                <div className="text-3xl sm:text-4xl font-black text-white">2.5K+</div>
+                <div className="text-3xl sm:text-4xl font-black text-white">
+                  <AnimatedCounter to={2500} format={(n) => `${Math.round(n).toLocaleString()}+`} />
+                </div>
                 <div className="text-xs font-bold text-white uppercase tracking-widest mt-1">Investors</div>
               </div>
               <div className="flex-1 min-w-[120px]">
-                <div className="text-3xl sm:text-4xl font-black text-white">100+</div>
+                <div className="text-3xl sm:text-4xl font-black text-white">
+                  <AnimatedCounter to={100} format={(n) => `${Math.round(n).toLocaleString()}+`} />
+                </div>
                 <div className="text-xs font-bold text-white uppercase tracking-widest mt-1">Regionals</div>
               </div>
           </div>
@@ -90,7 +99,7 @@ export function StartupWorldCupClient() {
               </div>
             </div>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-8 md:gap-12 w-full max-w-4xl mx-auto rounded-3xl bg-white/80 backdrop-blur-sm p-10 sm:p-12 shadow-xl border">
-              <div className="rounded-xl bg-primary aspect-square w-32 sm:w-44 flex items-center justify-center shrink-0 p-3">
+              <div className="rounded-xl bg-[#0284c7] aspect-square w-32 sm:w-44 flex items-center justify-center shrink-0 p-3">
                 <img
                   src={SWC_LOGO_SRC}
                   alt="Startup World Cup"
@@ -118,7 +127,7 @@ export function StartupWorldCupClient() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="flex flex-col items-center text-center space-y-8"
+            className="flex flex-col items-center text-center space-y-4 md:space-y-8"
           >
             <p className="text-primary font-medium uppercase tracking-[0.2em]">
               Regional Competition
@@ -179,20 +188,20 @@ export function StartupWorldCupClient() {
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className={`relative flex items-center gap-12`}
+                className={`relative flex items-center gap-6 md:gap-12`}
               >
                 <div className="w-1/2 text-right">
-                  <div className={`text-2xl font-black text-right ${item.active ? 'text-accent' : 'text-zinc-900'}`}>
+                  <div className={`text-base md:text-2xl font-black text-right ${item.active ? 'text-accent' : 'text-zinc-900'}`}>
                     {item.label}
                   </div>
                 </div>
                 
-                <div className={`z-10 w-12 h-12 rounded-full border-4 border-white shadow-lg flex items-center justify-center ${item.active ? 'bg-accent text-white' : 'bg-zinc-300 text-white'}`}>
+                <div className={`z-10 w-16 h-12 rounded-full border-4 border-white shadow-lg flex items-center justify-center ${item.active ? 'bg-accent text-white' : 'bg-zinc-300 text-white'}`}>
                   <Zap className="w-6 h-6" />
                 </div>
 
                 <div className="w-1/2">
-                  <div className={`text-xl font-bold  text-left font-bold text-cyan-700 `}>
+                  <div className={`text-base md:text-xl font-bold  text-left font-bold text-cyan-700 `}>
                     {item.date}
                   </div>
                 </div>

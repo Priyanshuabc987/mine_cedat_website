@@ -77,57 +77,54 @@ export function Navbar() {
         </div>
 
         {/* Auth Buttons */}
-<div className="hidden md:flex items-center gap-4">
-  {isAuthenticated && (
-    <div className="flex items-center gap-4">
-      {user?.roles?.includes('admin') && (
-        <Link href="/admin">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className={cn(
-              "rounded-full border-2 transition-all font-bold",
-              isSolid 
-                ? "border-primary/20 text-primary hover:bg-primary/5" 
-                : "border-white/20 bg-white/10 text-white hover:bg-white/20"
-            )}
-          >
-            <Shield className="w-4 h-4 mr-2" />
-            Admin
-          </Button>
-        </Link>
-      )}
-      
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button 
-            variant="outline" 
-            className={cn(
-              "rounded-full border-2 transition-all font-bold",
-              isSolid 
-                ? "border-primary/20 text-primary hover:bg-primary/5" 
-                : "border-white/20 bg-white/10 text-white hover:bg-white/20"
-            )}
-          >
-            <User className="w-4 h-4 mr-2" />
-            {user?.full_name ? user.full_name.split(' ')[0] : 'Account'}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => logout()} className="cursor-pointer text-destructive">
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
-  )}
-</div>
-
-
-
+        <div className="hidden md:flex items-center gap-4">
+          {isAuthenticated && (
+            <div className="flex items-center gap-4">
+              {user?.roles?.includes('admin') && (
+                <Link href="/admin">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className={cn(
+                      "rounded-full border-2 transition-all font-bold",
+                      isSolid 
+                        ? "border-primary/20 text-primary hover:bg-primary/5" 
+                        : "border-white/20 bg-white/10 text-white hover:bg-white/20"
+                    )}
+                  >
+                    <Shield className="w-4 h-4 mr-2" />
+                    Admin
+                  </Button>
+                </Link>
+              )}
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className={cn(
+                      "rounded-full border-2 transition-all font-bold",
+                      isSolid 
+                        ? "border-primary/20 text-primary hover:bg-primary/5" 
+                        : "border-white/20 bg-white/10 text-white hover:bg-white/20"
+                    )}
+                  >
+                    <User className="w-4 h-4 mr-2" />
+                    {user?.full_name ? user.full_name.split(' ')[0] : 'Account'}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => logout()} className="cursor-pointer text-destructive">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
+        </div>
 
         {/* Mobile Toggle */}
           <button
@@ -155,7 +152,7 @@ export function Navbar() {
               </Link>
             ))}
             <div className="h-px bg-border my-2" />
-            {isAuthenticated ? (
+            {isAuthenticated && (
               <div className="flex flex-col gap-2">
                 {user?.roles?.includes('admin') && (
                   <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)}>
@@ -172,15 +169,6 @@ export function Navbar() {
                   <LogOut className="w-4 h-4 mr-2" />
                   Logout
                 </Button>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-3">
-                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button className="w-full rounded-full h-12">Sign In</Button>
-                </Link>
-                <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="outline" className="w-full rounded-full h-12 border-2">Create Account</Button>
-                </Link>
               </div>
             )}
           </div>

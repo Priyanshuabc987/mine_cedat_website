@@ -21,6 +21,8 @@ export function EventList({ statusFilter, showStatusFilter = false, className = 
   const [selectedStatus, setSelectedStatus] = useState(statusFilter || ALL_VALUE);
 
   const queryStatus = selectedStatus !== ALL_VALUE ? selectedStatus : undefined;
+
+  
   
   const { 
     events, 
@@ -36,15 +38,12 @@ export function EventList({ statusFilter, showStatusFilter = false, className = 
     pageSize: initialLimit || undefined
   });
 
+
   // Client-side sorting for all loaded events
   const sortedEvents = [...events].sort((a, b) => {
-    const aIsPast = isPast(parseISO(a.event_date));
-    const bIsPast = isPast(parseISO(b.event_date));
-
-    if (aIsPast !== bIsPast) return aIsPast ? 1 : -1; // Future events first
-    if (!aIsPast) return parseISO(a.event_date).getTime() - parseISO(b.event_date).getTime(); // Soonest future event first
-    return parseISO(b.event_date).getTime() - parseISO(a.event_date).getTime(); // Most recent past event first
+    return parseISO(a.event_date).getTime() - parseISO(b.event_date).getTime();
   });
+  
   
   // The component no longer needs to manage its own `limit` state for display, 
   // as the hook now handles fetching the correct number of items.

@@ -30,15 +30,11 @@ export function EventListClient({ initialEvents, statusFilter }: EventListClient
     pageSize: 6,
   });
 
-  // Client-side sorting remains, ensuring a consistent order as more events are loaded.
-  const sortedEvents = [...events].sort((a, b) => {
-    const aIsPast = isPast(parseISO(a.event_date));
-    const bIsPast = isPast(parseISO(b.event_date));
 
-    if (aIsPast !== bIsPast) return aIsPast ? 1 : -1;
-    if (!aIsPast) return parseISO(a.event_date).getTime() - parseISO(b.event_date).getTime();
-    return parseISO(b.event_date).getTime() - parseISO(a.event_date).getTime();
+  const sortedEvents = [...events].sort((a, b) => {
+    return parseISO(a.event_date).getTime() - parseISO(b.event_date).getTime();
   });
+  
 
   if (isLoading && events.length === 0) {
     return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;

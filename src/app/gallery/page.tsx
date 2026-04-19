@@ -64,7 +64,7 @@ export default async function GalleryPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <GalleryPageClient photos={photos} videos={videos} />
+      <GalleryPageClient photos={photos} videos={videos}  />
     </>
   );
 }

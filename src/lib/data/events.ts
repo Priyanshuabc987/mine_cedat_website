@@ -22,12 +22,19 @@ async function _getEvents(options: {
   start_after_id?: string;
   page_size?: number;
 } = {}) {
+
   try {
     let query: admin.firestore.Query = adminDb.collection('events');
     if (options.status_filter) {
       query = query.where('status', '==', options.status_filter);
     }
-    query = query.orderBy('event_date', 'desc');
+
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    query = query
+      .where('event_date', '>=', todayStr)
+      .orderBy('event_date', 'asc');
+
     if (options.start_after_id) {
       const lastDoc = await adminDb.collection('events').doc(options.start_after_id).get();
       if (lastDoc.exists) {
@@ -69,10 +76,19 @@ async function _getEventById(id: string): Promise<Event | null> {
   }
 }
 
+function getTodayKey() {
+  const d = new Date();
+  return d.toISOString().split('T')[0]; // "2026-04-18"
+}
+
 export const getEvents = unstable_cache(
+
   _getEvents,
-  ['events'],
-  { revalidate: 86400, tags: ['events'] }
+  ['events', getTodayKey()],
+  {
+    revalidate: 86400,
+    tags: ['events']
+  }
 );
 
 // REFACTORED: Now uses the robust Firebase ID for fetching and caching.
@@ -86,16 +102,16 @@ export const getEventBySlug = async (slug: string): Promise<Event | null> => {
 
   // This function dynamically creates a cached version of _getEventById for the specific ID.
   // The cache is keyed by the stable ID, not the fragile slug.
-  const getCachedEventById = (id: string) => 
+  const getCachedEventById = (id: string) =>
     unstable_cache(
       async () => _getEventById(id),
       ['events', id], // Unique cache key for this specific ID
-      { 
+      {
         // This tag matches your revalidateTag call exactly
-        tags: [`event:${id}`] 
+        tags: [`event:${id}`]
       }
     )();
-  
+
 
   return getCachedEventById(eventId);
 };

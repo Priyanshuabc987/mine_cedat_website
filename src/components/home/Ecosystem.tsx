@@ -4,28 +4,28 @@
 import { motion } from "framer-motion";
 import { 
   Cpu, 
-  HeartPulse, 
-  Code, 
-  Globe, 
+  Activity, 
+  Sparkles, 
+  Ship, 
   Leaf, 
-  Shirt, 
+  ShoppingBag, 
   Sprout, 
-  Users, 
-  BookOpen, 
-  Network 
+  HandHelping, 
+  GraduationCap, 
+  Route 
 } from "lucide-react";
 
 const communities = [
   { name: "Hardware", icon: Cpu, color: "from-sky-100 to-blue-100" },
-  { name: "Healthcare", icon: HeartPulse, color: "from-red-100 to-pink-100" },
-  { name: "Technology", icon: Code, color: "from-purple-100 to-indigo-100" },
-  { name: "Import & Export", icon: Globe, color: "from-teal-100 to-cyan-100" },
+  { name: "Healthcare", icon: Activity, color: "from-red-100 to-pink-100" }, // Activity is standard for vitals/health
+  { name: "AI & Technology", icon: Sparkles, color: "from-purple-100 to-indigo-100" }, // Sparkles is the new "AI" standard
+  { name: "Import & Export", icon: Ship, color: "from-teal-100 to-cyan-100" }, // Ship or Truck represents logistics better
   { name: "Food & Agriculture", icon: Leaf, color: "from-green-100 to-lime-100" },
-  { name: "Fashion & Lifestyle", icon: Shirt, color: "from-rose-100 to-fuchsia-100" },
+  { name: "Fashion & Lifestyle", icon: ShoppingBag, color: "from-rose-100 to-fuchsia-100" }, // Covers both retail and fashion
   { name: "Sustainability & SDGs", icon: Sprout, color: "from-emerald-100 to-green-100" },
-  { name: "Social Impact & NGOs", icon: Users, color: "from-yellow-100 to-amber-100" },
-  { name: "Education & Employment", icon: BookOpen, color: "from-orange-100 to-red-100" },
-  { name: "Nexus of CEDAT (NOC)", icon: Network, color: "from-slate-100 to-gray-100" },
+  { name: "Social Impact & NGOs", icon: HandHelping, color: "from-yellow-100 to-amber-100" }, // More descriptive of NGO work
+  { name: "Education & Employment", icon: GraduationCap, color: "from-orange-100 to-red-100" }, // Classic academic icon
+  { name: "Nexus of CEDAT (NOC)", icon: Route, color: "from-slate-100 to-gray-100" }, // Represents a central connection point
 ];
 
 const cardVariants = {
@@ -43,7 +43,7 @@ const cardVariants = {
 
 export function Ecosystem() {
   return (
-    <section className="py-16 sm:py-24 bg-background">
+    <section className="py-12 sm:py-24 bg-background">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

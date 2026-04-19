@@ -67,18 +67,18 @@ export default async function EventsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
-      <main className="pt-32 pb-20">
+      <main className="pt-20 md:pt-32 pb-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <Link href="/">
-            <Button variant="ghost" size="sm" className="mb-8 hover:bg-primary/70">
+            <Button variant="ghost" size="sm" className="mb-4 md:mb-8 hover:bg-primary/70">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Home
             </Button>
           </Link>
 
-          <div className="max-w-4xl mb-16 space-y-4">
+          <div className="max-w-4xl mb-8 md:mb-16 space-y-4">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-foreground">
-              Startup <span className="text-primary italic">Meetups & Events</span>
+            Bangalore's Startup <span className="text-primary italic">Meetups & Events</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl">
               Connecting startups, students, and innovators into one powerful network. 
