@@ -7,14 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Event } from "@/hooks/useEvents";
 import { Calendar, Clock, MapPin, ExternalLink } from "lucide-react";
 import { getEventStatus, formatTime } from '@/lib/utils';
+import { WhatsAppIcon } from '../icons/WhatsAppIcon';
 
 interface EventDetailCardProps {
   event: Event;
   className?: string;
 }
 
-// This hook is necessary to avoid hydration mismatches between server and client
-// when calculating dynamic values like event status.
 const useHydrated = () => {
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => { setHydrated(true) }, []);
@@ -23,12 +22,21 @@ const useHydrated = () => {
 
 export function EventDetailCard({ event, className }: EventDetailCardProps) {
   const isHydrated = useHydrated();
+  const [shareUrl, setShareUrl] = useState('');
 
-  // Safely calculate dynamic values only on the client
   const eventStatus = isHydrated ? getEventStatus(event.event_date, event.start_time, event.end_time) : { text: 'Loading...', variant: 'outline' as const };
   const startTimeFormatted = isHydrated ? formatTime(event.start_time) : '...';
   const endTimeFormatted = isHydrated ? formatTime(event.end_time) : '...';
   const fullDate = new Date(event.event_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+  useEffect(() => {
+    if (isHydrated) {
+      const shareText = encodeURIComponent(
+        `Check out this event on Cedat:\n\n*${event.title}*\n\n📅 ${fullDate}\n\nFind out more and register:\n${window.location.href}`
+      );
+      setShareUrl(`https://api.whatsapp.com/send?text=${shareText}`);
+    }
+  }, [isHydrated, event.title, fullDate]);
 
   const canRegister = eventStatus.text !== 'Concluded' && !!event.external_registration_url;
 
@@ -46,18 +54,15 @@ export function EventDetailCard({ event, className }: EventDetailCardProps) {
 
   return (
     <Card className={`relative overflow-hidden rounded-2xl border-0 bg-gradient-to-br from-card to-muted/30 shadow-2xl shadow-primary/10 ${className}`}>
-      <div className="absolute top-2 right-6 z-10 translate-x-1/5 translate-y-1/5">
-  {/* Changed rounded-full to rounded-xl and updated gradient to Gold colors */}
-  <div className="flex h-12 w-28 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-300 via-yellow-500 to-amber-600 p-[2px] shadow-lg">
-    {/* Inner container to create a nice border effect and hold the text */}
-    <div className="flex h-full w-full items-center justify-center rounded-[10px] bg-gradient-to-br from-amber-400 to-yellow-600 px-3 py-1 shadow-inner">
-      <span className="text-sm font-black uppercase tracking-wider text-white drop-shadow-md">
-        Free Entry
-      </span>
-    </div>
-  </div>
-</div>
-
+        <div className="absolute top-2 right-6 z-10 translate-x-1/5 translate-y-1/5">
+            <div className="flex h-12 w-28 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-300 via-yellow-500 to-amber-600 p-[2px] shadow-lg">
+                <div className="flex h-full w-full items-center justify-center rounded-[10px] bg-gradient-to-br from-amber-400 to-yellow-600 px-3 py-1 shadow-inner">
+                <span className="text-sm font-black uppercase tracking-wider text-white drop-shadow-md">
+                    Free Entry
+                </span>
+                </div>
+            </div>
+        </div>
 
       <CardHeader className="border-b border-border/50 p-5 bg-gradient-to-b from-primary/10 to-transparent">
         <CardTitle>Event Details</CardTitle>
@@ -92,7 +97,18 @@ export function EventDetailCard({ event, className }: EventDetailCardProps) {
           )}
         </div>
 
-        {registrationButton}
+        <div className="space-y-2">
+            {registrationButton}
+            {isHydrated && canRegister && (
+                <Button asChild variant="outline" className="w-full bg-green">
+                    <a href={shareUrl} target="_blank" rel="noopener noreferrer">
+                        <WhatsAppIcon className="mr-2 h-4 w-4" />
+                        Share on WhatsApp
+                    </a>
+                </Button>
+            )}
+        </div>
+        
         {canRegister && <p className='text-xs text-muted-foreground text-center'>You will be redirected to an external site.</p>}
       </CardContent>
     </Card>

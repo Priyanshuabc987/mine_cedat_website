@@ -6,18 +6,16 @@ import { collection, query, where, orderBy, doc, deleteDoc, updateDoc, addDoc, s
 import { useMutation, useQueryClient, useInfiniteQuery, QueryFunctionContext } from '@tanstack/react-query';
 import { generateSlug } from '@/lib/utils';
 import { revalidateEventsList, revalidateEventDetail } from '@/lib/actions/revalidate';
-import { uploadToCloudinary } from '@/lib/cloudinary'; // Import the function
-
-// The uploadToCloudinary function has been removed from here
+import { uploadToCloudinary } from '@/lib/cloudinary';
 
 export interface Event {
   id: string;
   title: string;
   slug?: string;
   description?: string;
-  event_date: string; 
-  start_time: string; 
-  end_time: string;   
+  event_date: string;
+  start_time: string;
+  end_time: string;
   location?: string;
   status: 'draft' | 'published' | 'cancelled';
   category?: string;
@@ -35,11 +33,13 @@ type EventsPage = {
 export function useEvents({ 
   status_filter, 
   pageSize = PAGE_SIZE, 
-  initialData 
+  initialData,
+  staleTime, // Allow staleTime to be passed
 }: { 
   status_filter?: string, 
   pageSize?: number,
-  initialData?: Event[]
+  initialData?: Event[],
+  staleTime?: number,
 } = {}) {
   const db = useFirestore();
 
@@ -66,11 +66,11 @@ export function useEvents({
     isLoading, 
     isFetchingNextPage, 
     error 
-  } = useInfiniteQuery<EventsPage, Error> ({
+  } = useInfiniteQuery<EventsPage, Error>({
     queryKey: ['events', { status_filter }],
     queryFn: fetchEvents,
     initialPageParam: null,
-    getNextPageParam: (lastPage: EventsPage) => {
+    getNextPageParam: (lastPage) => {
       if (lastPage.events.length < pageSize) return undefined; 
       return lastPage.lastDoc;
     },
@@ -80,6 +80,8 @@ export function useEvents({
           pageParams: [null],
         }
       : undefined,
+    // Use staleTime to control re-fetching
+    staleTime: staleTime,
   });
 
   const allEvents = data?.pages.flatMap(page => page.events) || [];

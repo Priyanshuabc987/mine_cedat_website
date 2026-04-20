@@ -5,7 +5,7 @@ import { EventCard } from './EventCard';
 import { Button } from '@/components/ui/button';
 import { Loader2, ChevronDown } from 'lucide-react';
 import { useEvents, Event } from '@/hooks/useEvents';
-import { isPast, parseISO } from 'date-fns';
+import { parseISO } from 'date-fns';
 
 interface EventListClientProps {
   initialEvents: Event[];
@@ -24,19 +24,23 @@ export function EventListClient({ initialEvents, statusFilter }: EventListClient
     error 
   } = useEvents({
     status_filter: statusFilter,
-    // The initial data is passed directly to the hook.
     initialData: initialEvents,
-    // The page size should match what was fetched on the server.
     pageSize: 6,
+    // Prevent automatic re-fetching by making server data permanently fresh
+    staleTime: Infinity,
   });
-
 
   const sortedEvents = [...events].sort((a, b) => {
-    return parseISO(a.event_date).getTime() - parseISO(b.event_date).getTime();
+    // Basic guard against invalid dates
+    if (!a.event_date || !b.event_date) return 0;
+    try {
+      return parseISO(a.event_date).getTime() - parseISO(b.event_date).getTime();
+    } catch (e) {
+      return 0;
+    }
   });
   
-
-  if (isLoading && events.length === 0) {
+  if (isLoading && sortedEvents.length === 0) {
     return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   }
 
@@ -44,12 +48,12 @@ export function EventListClient({ initialEvents, statusFilter }: EventListClient
     return <div className="text-center py-12"><p className="text-destructive">Failed to load events.</p></div>;
   }
 
-  if (events.length === 0) {
-    return <div className="text-center py-12"><p className="text-muted-foreground">No events found.</p></div>;
+  if (sortedEvents.length === 0) {
+    return <div className="text-center py-12"><p className="text-muted-foreground">No upcoming events at the moment. Check back soon!</p></div>;
   }
 
   return (
-    <div>
+    <div className="w-full">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8 items-stretch">
         {sortedEvents.map((event) => <EventCard key={event.id} event={event} />)}
       </div>

@@ -5,6 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Providers } from "./providers";
 import { BASE_URL, LOGO_URL } from "@/lib/constants";
+import { FaviconFixer } from "@/components/layout/FaviconFixer";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -97,6 +98,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <FaviconFixer />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
