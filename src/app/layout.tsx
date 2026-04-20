@@ -55,7 +55,8 @@ export default function RootLayout({
         "description": "Cedat is Bengaluru's largest and most diverse startup ecosystem, providing resources, events, and a community for entrepreneurs across all sectors.",
         "sameAs": [
           "https://www.linkedin.com/company/cedat/",
-          "https://twitter.com/cedat_org"
+          "https://twitter.com/cedat_org",
+          "https://www.instagram.com/cedat.in"
         ]
       },
       {
@@ -63,21 +64,21 @@ export default function RootLayout({
         "name": "Cedat",
         "description": "The central hub for Bengaluru's startup ecosystem, offering events, meetups, and community support across various tech and business sectors.",
         "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "your-street-address",
-          "addressLocality": "Bengaluru",
-          "addressRegion": "KA",
-          "postalCode": "your-postal-code",
-          "addressCountry": "IN"
+            "@type": "PostalAddress",
+            "streetAddress": "116, OM SHIVA SHAKTHI, 3RD MAIN, 4TH CROSS, Marathahalli Colony",
+            "addressLocality": "Bangalore",
+            "addressRegion": "KA",
+            "postalCode": "560037",
+            "addressCountry": "IN"
         },
         "geo": {
           "@type": "GeoCoordinates",
-          "latitude": 12.9716,
-          "longitude": 77.5946
+          "latitude": 12.9569,
+          "longitude": 77.7011
         },
         "url": BASE_URL,
-        "telephone": "+91-your-phone-number",
-        "pricerange": "$",
+        "telephone": "+91-7406345305",
+        "pricerange": "₹",
         "image": LOGO_URL,
         "department": [
           { "@type": "Organization", "name": "Hardware" },
