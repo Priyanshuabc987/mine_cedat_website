@@ -5,8 +5,8 @@ import { Metadata } from "next";
 import { BASE_URL, LOGO_URL } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "Event Gallery - Photos of Bangalore's Startup and Tech Community",
-  description: "Explore photos from Cedat's vibrant events. See the energy of our startup meetups, workshops, and networking sessions. A glimpse into the heart of Bangalore's tech ecosystem.",
+  title: "Event Gallery - Photos of Bengaluru's Startup and Tech Community",
+  description: "Explore photos from Cedat's vibrant events. See the energy of our startup meetups, workshops, and networking sessions. A glimpse into the heart of Bengaluru's tech ecosystem.",
   openGraph: {
     title: "Event Gallery - Cedat",
     description: "Explore photos from Cedat's vibrant events and see the energy of our startup community.",

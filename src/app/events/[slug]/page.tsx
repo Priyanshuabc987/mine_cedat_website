@@ -27,8 +27,8 @@ export async function generateMetadata({ params }: EventDetailPageProps): Promis
     return { title: "Event Not Found" };
   }
 
-  const pageTitle = `${event.title} - Cedat: Bangalore Startup Event`;
-  const pageDescription = `Join us for ${event.title}, a premier event for the Bangalore startup ecosystem. ${event.description?.substring(0, 120)}...`;
+  const pageTitle = `${event.title} - Cedat: Bengaluru Startup Event`;
+  const pageDescription = `Join us for ${event.title}, a premier event for the Bengaluru startup ecosystem. ${event.description?.substring(0, 120)}...`;
   const imageUrl = event.featured_image_url || LOGO_URL;
   const pageUrl = `${BASE_URL}/events/${event.slug}`;
 
@@ -87,11 +87,11 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
         "eventAttendanceMode": "https://schema.org/MixedEventAttendanceMode",
         "location": {
             "@type": "Place",
-            "name": event.location || "Bangalore",
+            "name": event.location || "Bengaluru",
             "address": {
                 "@type": "PostalAddress",
-                "streetAddress": event.location || "Bangalore",
-                "addressLocality": "Bangalore",
+                "streetAddress": event.location || "Bengaluru",
+                "addressLocality": "Bengaluru",
                 "addressRegion": "KA",
                 "postalCode": "560001",
                 "addressCountry": "IN"
@@ -150,7 +150,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
             {otherEvents.length > 0 && (
               <div className="mt-6 md:mt-10">
                 <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-10">
-                  Other Upcoming Events in Bangalore
+                  Upcoming Meetups & Events in Bengaluru
                 </h2>
                 <StaticEventList events={otherEvents} />
               </div>

@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { SocialPost } from "@/lib/data/socialposts";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { extractLinkedInID } from "@/lib/utils";
+import { ChevronRight } from "lucide-react";
 
 const LINKEDIN_EMBED_HEIGHT_DESKTOP = 610;
 const INSTAGRAM_EMBED_HEIGHT_DESKTOP = 610;
@@ -87,21 +88,26 @@ function SocialRow({
   platform: "linkedin" | "instagram";
 }) {
   const isMobile = useIsMobile();
-    
+
   const cardBgClass = platform === 'linkedin'
     ? 'bg-[#0A66C2]'
     : 'bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]';
-    
-  const embedHeight = platform === 'linkedin' 
+
+  const embedHeight = platform === 'linkedin'
     ? (isMobile ? LINKEDIN_EMBED_HEIGHT_MOBILE : LINKEDIN_EMBED_HEIGHT_DESKTOP)
     : (isMobile ? INSTAGRAM_EMBED_HEIGHT_MOBILE : INSTAGRAM_EMBED_HEIGHT_DESKTOP);
 
   return (
     <div className="mb-10 sm:mb-14 last:mb-0">
-      <div className="flex items-end justify-between mb-4">
-        <h3 className="text-xl sm:text-2xl font-display font-bold">{title}</h3>
-        <p className="text-xs sm:text-sm text-muted-foreground">Scroll horizontally</p>
-      </div>
+      <div className="flex items-center justify-between mb-4">
+  <h3 className="text-xl sm:text-2xl font-display font-bold">{title}</h3>
+  
+  {/* The container for the icon/text */}
+  {/* <div className="flex items-center text-muted-foreground"> */}
+    <ChevronRight className="w-5 h-5" /> 
+  {/* </div> */}
+</div>
+
 
       <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-3 -mx-2 px-4 snap-x snap-mandatory [scrollbar-width:thin]">
         {posts.map((post, index) => {
@@ -114,32 +120,32 @@ function SocialRow({
               viewport={{ once: true }}
               className={`snap-start shrink-0 w-[90vw] sm:w-[68vw] md:w-[400px] rounded-2xl p-2 sm:p-3 overflow-hidden shadow-lg ${cardBgClass}`}
             >
-                <div 
-                  className="bg-background rounded-lg overflow-hidden"
-                  style={{ height: embedHeight }}
-                >
-                  {platform === "instagram" ? (
-                      <iframe
-                        src={getInstagramEmbedUrl(post.post_url)}
-                        height={embedHeight}
-                        width="100%"
-                        frameBorder="0"
-                        scrolling="no"
-                        title={`Embedded Instagram post: ${post.id}`}
-                        className="w-full border-none"
-                      />
-                  ) : (
-                      <iframe
-                        src={`https://www.linkedin.com/embed/feed/update/${extractLinkedInID(post.post_url)}?collapsed=1`}
-                        height={embedHeight}
-                        width="100%"
-                        frameBorder="0"
-                        allowFullScreen
-                        title={`LinkedIn post by CEDAT: ${post.id}`}
-                        className="w-full border-none"
-                      />
-                  )}
-                </div>
+              <div
+                className="bg-background rounded-lg overflow-hidden"
+                style={{ height: embedHeight }}
+              >
+                {platform === "instagram" ? (
+                  <iframe
+                    src={getInstagramEmbedUrl(post.post_url)}
+                    height={embedHeight}
+                    width="100%"
+                    frameBorder="0"
+                    scrolling="no"
+                    title={`Embedded Instagram post: ${post.id}`}
+                    className="w-full border-none"
+                  />
+                ) : (
+                  <iframe
+                    src={`https://www.linkedin.com/embed/feed/update/${extractLinkedInID(post.post_url)}?collapsed=1`}
+                    height={embedHeight}
+                    width="100%"
+                    frameBorder="0"
+                    allowFullScreen
+                    title={`LinkedIn post by CEDAT: ${post.id}`}
+                    className="w-full border-none"
+                  />
+                )}
+              </div>
             </motion.div>
           );
         })}
@@ -155,6 +161,6 @@ function getInstagramEmbedUrl(url: string): string {
     if (match?.[1] && match?.[2]) {
       return `https://www.instagram.com/${match[1].toLowerCase()}/${match[2]}/embed/`;
     }
-  } catch {}
+  } catch { }
   return url.includes('/embed') ? url : `${url.split('?')[0]}embed`;
 }

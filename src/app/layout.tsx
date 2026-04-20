@@ -8,15 +8,15 @@ import { BASE_URL, LOGO_URL } from "@/lib/constants";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
-  title: "Cedat: Bangalore's Largest Startup Ecosystem & Tech Community Hub",
-  description: "Welcome to Cedat, Bangalore's largest and most diverse startup ecosystem. We are community builders across all sectors, offering regular meetups, events, funding opportunities, and resources for founders in Hardware, Healthcare, Tech, Social Impact, and more. Join us to connect, learn, and grow your startup.",
-  keywords: "startup ecosystem bangalore, startup community bangalore, tech community bangalore, entrepreneur network bangalore, startup events bangalore, tech meetups bangalore, founder events, startup funding bangalore, seed funding, angel investors bangalore, startup ideas, how to start a startup, hardware startups, healthcare startups, edtech, foodtech, social impact startups, fashion startups, import export business, sustainability, NGOs, Bangalore, Karnataka",
+  title: "Cedat: Bengaluru's Largest Startup Ecosystem & Tech Community Hub",
+  description: "Welcome to Cedat, Bengaluru's largest and most diverse startup ecosystem. We are community builders across all sectors, offering regular meetups, events, funding opportunities, and resources for founders in Hardware, Healthcare, Tech, Social Impact, and more. Join us to connect, learn, and grow your startup.",
+  keywords: "startup ecosystem Bengaluru, startup community Bengaluru, tech community Bengaluru, entrepreneur network Bengaluru, startup events Bengaluru, tech meetups Bengaluru, founder events, startup funding Bengaluru, seed funding, angel investors Bengaluru, startup ideas, how to start a startup, hardware startups, healthcare startups, edtech, foodtech, social impact startups, fashion startups, import export business, sustainability, NGOs, Bengaluru, Karnataka",
   icons: {
     icon: LOGO_URL,
   },
   openGraph: {
-    title: "Cedat: Bangalore's Largest Startup Ecosystem & Tech Community Hub",
-    description: "Welcome to Cedat, Bangalore's largest and most diverse startup ecosystem. Join us to connect, learn, and grow your startup.",
+    title: "Cedat: Bengaluru's Largest Startup Ecosystem & Tech Community Hub",
+    description: "Welcome to Cedat, Bengaluru's largest and most diverse startup ecosystem. Join us to connect, learn, and grow your startup.",
     url: BASE_URL,
     siteName: 'Cedat',
     images: [
@@ -31,8 +31,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Cedat: Bangalore's Largest Startup Ecosystem & Tech Community Hub",
-    description: "Welcome to Cedat, Bangalore's largest and most diverse startup ecosystem. Join us to connect, learn, and grow your startup.",
+    title: "Cedat: Bengaluru's Largest Startup Ecosystem & Tech Community Hub",
+    description: "Welcome to Cedat, Bengaluru's largest and most diverse startup ecosystem. Join us to connect, learn, and grow your startup.",
     images: [LOGO_URL],
     creator: '@cedat_org',
   },
@@ -51,7 +51,7 @@ export default function RootLayout({
         "name": "Cedat",
         "url": BASE_URL,
         "logo": LOGO_URL,
-        "description": "Cedat is Bangalore's largest and most diverse startup ecosystem, providing resources, events, and a community for entrepreneurs across all sectors.",
+        "description": "Cedat is Bengaluru's largest and most diverse startup ecosystem, providing resources, events, and a community for entrepreneurs across all sectors.",
         "sameAs": [
           "https://www.linkedin.com/company/cedat/",
           "https://twitter.com/cedat_org"
@@ -60,11 +60,11 @@ export default function RootLayout({
       {
         "@type": "LocalBusiness",
         "name": "Cedat",
-        "description": "The central hub for Bangalore's startup ecosystem, offering events, meetups, and community support across various tech and business sectors.",
+        "description": "The central hub for Bengaluru's startup ecosystem, offering events, meetups, and community support across various tech and business sectors.",
         "address": {
           "@type": "PostalAddress",
           "streetAddress": "your-street-address",
-          "addressLocality": "Bangalore",
+          "addressLocality": "Bengaluru",
           "addressRegion": "KA",
           "postalCode": "your-postal-code",
           "addressCountry": "IN"

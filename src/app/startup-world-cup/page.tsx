@@ -4,11 +4,11 @@ import { BASE_URL, LOGO_URL } from '@/lib/constants';
 import { StartupWorldCupClient } from './StartupWorldCupClient';
 
 export const metadata: Metadata = {
-  title: "Startup World Cup Bangalore - Pitch Competition | Cedat",
-  description: "Apply for the Startup World Cup Bangalore regional, hosted by Cedat. Win $1M in investment, connect with global investors, and showcase your startup on a world stage. Your journey from Bangalore to global recognition starts here.",
+  title: "Startup World Cup Bengaluru - Pitch Competition | Cedat",
+  description: "Apply for the Startup World Cup Bengaluru regional, hosted by Cedat. Win $1M in investment, connect with global investors, and showcase your startup on a world stage. Your journey from Bengaluru to global recognition starts here.",
   openGraph: {
-    title: "Startup World Cup Bangalore - Pitch Competition | Cedat",
-    description: "Apply for the Startup World Cup Bangalore regional, hosted by Cedat. Win $1M in investment, connect with global investors, and showcase your startup on a world stage.",
+    title: "Startup World Cup Bengaluru - Pitch Competition | Cedat",
+    description: "Apply for the Startup World Cup Bengaluru regional, hosted by Cedat. Win $1M in investment, connect with global investors, and showcase your startup on a world stage.",
     url: `${BASE_URL}/startup-world-cup`,
     siteName: 'Cedat',
     images: [
@@ -16,15 +16,15 @@ export const metadata: Metadata = {
         url: LOGO_URL,
         width: 1200,
         height: 630,
-        alt: 'Startup World Cup Bangalore',
+        alt: 'Startup World Cup Bengaluru',
       },
     ],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Startup World Cup Bangalore - Pitch Competition | Cedat",
-    description: "Apply for the Startup World Cup Bangalore regional, hosted by Cedat.",
+    title: "Startup World Cup Bengaluru - Pitch Competition | Cedat",
+    description: "Apply for the Startup World Cup Bengaluru regional, hosted by Cedat.",
     images: [LOGO_URL],
     creator: '@cedat_org',
   },

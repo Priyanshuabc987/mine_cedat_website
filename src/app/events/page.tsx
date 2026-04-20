@@ -8,11 +8,11 @@ import { Metadata } from 'next';
 import { BASE_URL, LOGO_URL } from '@/lib/constants';
 
 export const metadata: Metadata = {
-  title: "Startup Events in Bangalore - Cedat",
-  description: "Browse upcoming startup meetups, workshops, and networking events in Bangalore. Join the Cedat community and connect with fellow innovators.",
+  title: "Startup Events in Bengaluru - Cedat",
+  description: "Browse upcoming startup meetups, workshops, and networking events in Bengaluru. Join the Cedat community and connect with fellow innovators.",
   openGraph: {
-    title: "Startup Events in Bangalore - Cedat",
-    description: "Browse upcoming startup meetups, workshops, and networking events in Bangalore. Join the Cedat community and connect with fellow innovators.",
+    title: "Startup Events in Bengaluru - Cedat",
+    description: "Browse upcoming startup meetups, workshops, and networking events in Bengaluru. Join the Cedat community and connect with fellow innovators.",
     url: `${BASE_URL}/events`,
     siteName: 'Cedat',
     images: [
@@ -27,8 +27,8 @@ export const metadata: Metadata = {
   },
    twitter: {
       card: 'summary_large_image',
-      title: "Startup Events in Bangalore - Cedat",
-      description: "Browse upcoming startup meetups, workshops, and networking events in Bangalore. Join the Cedat community and connect with fellow innovators.",
+      title: "Startup Events in Bengaluru - Cedat",
+      description: "Browse upcoming startup meetups, workshops, and networking events in Bengaluru. Join the Cedat community and connect with fellow innovators.",
       images: [LOGO_URL],
       creator: '@cedat_org',
     },
@@ -76,9 +76,9 @@ export default async function EventsPage() {
             </Button>
           </Link>
 
-          <div className="max-w-4xl mb-8 md:mb-16 space-y-4">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-foreground">
-            Bangalore's Startup <span className="text-primary italic">Meetups & Events</span>
+          <div className="max-w-6xl mb-8 md:mb-16 space-y-4">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-primary italic">
+            Bengaluru's Startup Meetups & Events
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl">
               Connecting startups, students, and innovators into one powerful network. 

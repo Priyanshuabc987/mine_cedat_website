@@ -4,10 +4,10 @@ import { BASE_URL, LOGO_URL } from '@/lib/constants';
 import { AskUsClient } from './AskUsClient';
 
 export const metadata: Metadata = {
-  title: "Ask the Cedat Community | Bangalore Startup Help & Support",
-  description: "Have a question about the Bangalore startup ecosystem? Need help with your startup idea? Ask the Cedat community. We're here to support you with resources, connections, and advice.",
+  title: "Ask the Cedat Community | Bengaluru Startup Help & Support",
+  description: "Have a question about the Bengaluru startup ecosystem? Need help with your startup idea? Ask the Cedat community. We're here to support you with resources, connections, and advice.",
   openGraph: {
-    title: "Ask the Cedat Community | Bangalore Startup Help & Support",
+    title: "Ask the Cedat Community | Bengaluru Startup Help & Support",
     description: "Get support and answers from the Cedat community. We're here to help you on your startup journey.",
     url: `${BASE_URL}/ask-us`,
     siteName: 'Cedat',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Ask the Cedat Community | Bangalore Startup Help & Support",
+    title: "Ask the Cedat Community | Bengaluru Startup Help & Support",
     description: "Get support and answers from the Cedat community. We're here to help you on your startup journey.",
     images: [LOGO_URL],
     creator: '@cedat_org',

@@ -76,7 +76,7 @@ export function EventCard({ event }: EventCardProps) {
           </div>
 
           <div className="p-4 sm:p-6 flex flex-col flex-1">
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-muted-foreground mb-3">
+            <div className="flex flex-wrap items-center gap-x-1 md:gap-x-3 gap-y-1 text-xs font-medium text-muted-foreground mb-3">
               <span className="flex items-center gap-1.5 min-w-0">
                 <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
                 <span className="truncate">{dateInfo.full}</span>
@@ -86,7 +86,7 @@ export function EventCard({ event }: EventCardProps) {
                 <Clock className="w-3.5 h-3.5 flex-shrink-0" />
                 {/* 4. FIX: Time is now correctly formatted to AM/PM */}
                 <span className="truncate">
-                  {isHydrated ? `${startTimeFormatted} - ${endTimeFormatted}` : <span>&nbsp;</span>}
+                  {isHydrated ? `${startTimeFormatted}` : <span>&nbsp;</span>}
                 </span>
               </span>
               {event.location && (

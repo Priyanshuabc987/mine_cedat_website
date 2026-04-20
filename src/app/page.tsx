@@ -12,13 +12,14 @@ import { EventListClient } from "@/components/events/EventListClient";
 import { Metadata } from 'next';
 import { BASE_URL, LOGO_URL } from '@/lib/constants';
 import { Metrics } from "@/components/home/Metrics";
+import { MessageCircle } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Cedat: Bangalore's Largest Startup Ecosystem & Tech Community Hub",
-  description: "Welcome to Cedat, Bangalore's largest and most diverse startup ecosystem. We are community builders across all sectors, offering regular meetups, events, funding opportunities, and resources for founders in Hardware, Healthcare, Tech, Social Impact, and more. Join us to connect, learn, and grow your startup.",
+  title: "Cedat: Bengaluru's Largest Startup Ecosystem & Tech Community Hub",
+  description: "Welcome to Cedat, Bengaluru's largest and most diverse startup ecosystem. We are community builders across all sectors, offering regular meetups, events, funding opportunities, and resources for founders in Hardware, Healthcare, Tech, Social Impact, and more. Join us to connect, learn, and grow your startup.",
   openGraph: {
-    title: "Cedat: Bangalore's Largest Startup Ecosystem & Tech Community Hub",
-    description: "Welcome to Cedat, Bangalore's largest and most diverse startup ecosystem. Join us to connect, learn, and grow your startup.",
+    title: "Cedat: Bengaluru's Largest Startup Ecosystem & Tech Community Hub",
+    description: "Welcome to Cedat, Bengaluru's largest and most diverse startup ecosystem. Join us to connect, learn, and grow your startup.",
     url: BASE_URL,
     siteName: 'Cedat',
     images: [
@@ -33,8 +34,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Cedat: Bangalore's Largest Startup Ecosystem & Tech Community Hub",
-    description: "Welcome to Cedat, Bangalore's largest and most diverse startup ecosystem. Join us to connect, learn, and grow your startup.",
+    title: "Cedat: Bengaluru's Largest Startup Ecosystem & Tech Community Hub",
+    description: "Welcome to Cedat, Bengaluru's largest and most diverse startup ecosystem. Join us to connect, learn, and grow your startup.",
     images: [LOGO_URL],
     creator: '@cedat_org',
   },
@@ -62,11 +63,11 @@ export default async function Home() {
       <section className="pt-14 md:pt-24  container mx-auto px-4 sm:px-6">
         <div className="flex flex-col md:flex-row justify-between items-start mb-12 gap-6">
           <div className="space-y-4">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-foreground">
-              Join Bangalore's Most Active <span className="text-primary italic">Startup Events</span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-primary italic">
+              Startup Ecosystem Meetups & Events
             </h2>
             <p className="text-muted-foreground text-base md:text-lg ">
-              Explore exclusive meetups and networking sessions. Cedat is your gateway to the heart of the Bangalore startup ecosystem.
+              Explore exclusive meetups and networking sessions. Cedat is your gateway to the heart of the Bengaluru startup ecosystem.
             </p>
           </div>
           <Link href="/events">
@@ -90,20 +91,21 @@ export default async function Home() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-5xl space-y-8">
             <h2 className="text-3xl sm:text-6xl font-black leading-tight">
-              Pitch Your Startup Idea to the World: <span className="text-accent italic">The Startup World Cup</span>
+              Fouders & Investors Xplore (FIX) by CEDAT: <span className="text-accent italic">Pitch Your StartUp</span>
             </h2>
             <p className="text-lg md:text-xl text-white/80 leading-relaxed">
-              This is your chance to shine on a global stage. As the official host of the Startup World Cup regional finals in Bangalore, we're looking for the next game-changers. Secure your spot, get noticed by international investors, and compete for a $1M investment prize.
+            FIX connects ambitious founders with top-tier investors and mentors. Whether you’re pitching on stage or networking from the floor, find the fuel for your startup journey here.
             </p>
             <div className="flex flex-wrap gap-4 pt-4">
-              <Link href="/startup-world-cup">
+              <Link href="/fic">
                 <Button size="lg" className="rounded-full bg-accent hover:bg-accent/90 text-white font-black px-6 md:px-10 h-12 md:h-16 text-sm md:text-lg">
-                  Apply for SWC 2024
+                  Apply Now 
                 </Button>
               </Link>
-              <Link href="/ask-us">
+              <Link href="https://wa.me/7406345305?text=I%20wanted%20to%20know%20more%20about%20FIX" target="_blank">
                 <Button size="lg" variant="outline" className="rounded-full border-2 border-white text-black hover:bg-white/10 px-6 md:px-10 h-10 md:h-16 text-sm md:text-lg">
-                  Learn More
+                <MessageCircle className="w-5 h-5" />
+                  Contact Us 
                 </Button>
               </Link>
             </div>

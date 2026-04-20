@@ -27,7 +27,7 @@ export const seoConfigs: Record<string, SEOConfig> = {
     description: 'Moments captured across our ecosystem.',
   },
   startupWorldCup: {
-    title: 'Startup World Cup Bangalore Regional | Cedat',
+    title: 'Startup World Cup Bengaluru Regional | Cedat',
     description: 'Register for the world\'s largest startup competition.',
   },
   askUs: {

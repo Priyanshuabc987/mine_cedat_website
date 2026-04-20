@@ -39,7 +39,7 @@ export function StartupWorldCupClient() {
               transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
               className="mt-4 text-lg sm:text-xl md:text-2xl font-bold text-accent max-w-2xl mx-auto"
             >
-              Bangalore Regional
+              Bengaluru Regional
             </p> */}
         </div>
 
@@ -133,21 +133,21 @@ export function StartupWorldCupClient() {
               Regional Competition
             </p>
             <h2 className="text-4xl sm:text-6xl font-display font-bold tracking-tight text-gray-900">
-              Bangalore Regional
+              Bengaluru Regional
             </h2>
             <p className="text-xl font-bold text-primary max-w-2xl mx-auto">
               Hosted by CEDAT
             </p>
             <img
               src="/startupworldcup/SWC1.png"
-              alt="Startup World Cup Bangalore Regional"
+              alt="Startup World Cup Bengaluru Regional"
               className="w-full max-w-3xl mx-auto rounded-2xl object-contain shadow-xl border"
             />
             <p className="text-lg text-gray-600 max-w-xl italic">
               “This platform is for startups and startup ecosystems of the world.”
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Link href="https://www.startupworldcup.io/bangalore-2026" target="_blank">
+              <Link href="https://www.startupworldcup.io/Bengaluru-2026" target="_blank">
                 <Button size="lg" className="rounded-full font-semibold px-8 py-6 text-base shadow-md">
                   Register to Pitch
                 </Button>
@@ -164,7 +164,7 @@ export function StartupWorldCupClient() {
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-8 mb-12 pb-8 border-b">
                   <div className="flex items-center gap-4">
                     <MapPin className="w-10 h-10 text-primary" />
-                    <span className="text-2xl font-bold text-gray-900">Bangalore, India</span>
+                    <span className="text-2xl font-bold text-gray-900">Bengaluru, India</span>
                   </div>
                   <div className="hidden sm:block w-px h-12 bg-gray-300"></div>
                   <div className="flex items-center gap-4">
@@ -307,7 +307,7 @@ export function StartupWorldCupClient() {
                 <span className="font-semibold text-primary">Startup World Cup</span> is a global conference and competition that brings together the top startups, VCs, entrepreneurs and world-class tech CEOs.
               </p>
               <p>
-                <span className="font-semibold text-primary">CEDAT</span> is proud to host the Bangalore Regional, connecting India's thriving startup ecosystem with the world's largest startup competition.
+                <span className="font-semibold text-primary">CEDAT</span> is proud to host the Bengaluru Regional, connecting India's thriving startup ecosystem with the world's largest startup competition.
               </p>
             </div>
           </div>
