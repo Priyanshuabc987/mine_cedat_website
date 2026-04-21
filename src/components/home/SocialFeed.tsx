@@ -21,6 +21,7 @@ export function SocialFeed({ initialPosts }: SocialFeedProps) {
   const posts = initialPosts || [];
   const linkedinPosts = posts.filter((post) => post.platform === "linkedin");
   const instagramPosts = posts.filter((post) => post.platform === "instagram");
+  const youtubePosts = posts.filter((post) => post.platform === "youtube");
 
   useEffect(() => {
     if (typeof window !== 'undefined' && linkedinPosts.length > 0) {
@@ -73,6 +74,14 @@ export function SocialFeed({ initialPosts }: SocialFeedProps) {
             platform="instagram"
           />
         )}
+        
+        {youtubePosts.length > 0 && (
+          <SocialRow
+            title="YouTube Podcasts"
+            posts={youtubePosts}
+            platform="youtube"
+          />
+        )}
       </div>
     </section>
   );
@@ -85,13 +94,15 @@ function SocialRow({
 }: {
   title: string;
   posts: SocialPost[];
-  platform: "linkedin" | "instagram";
+  platform: "linkedin" | "instagram" | "youtube";
 }) {
   const isMobile = useIsMobile();
 
   const cardBgClass = platform === 'linkedin'
     ? 'bg-[#0A66C2]'
-    : 'bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]';
+    : platform === 'instagram' 
+    ? 'bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]'
+    : 'bg-[#FF0000]';
 
   const embedHeight = platform === 'linkedin'
     ? (isMobile ? LINKEDIN_EMBED_HEIGHT_MOBILE : LINKEDIN_EMBED_HEIGHT_DESKTOP)
@@ -100,14 +111,9 @@ function SocialRow({
   return (
     <div className="mb-10 sm:mb-14 last:mb-0">
       <div className="flex items-center justify-between mb-4">
-  <h3 className="text-xl sm:text-2xl font-display font-bold">{title}</h3>
-  
-  {/* The container for the icon/text */}
-  {/* <div className="flex items-center text-muted-foreground"> */}
-    <ChevronRight className="w-5 h-5" /> 
-  {/* </div> */}
-</div>
-
+        <h3 className="text-xl sm:text-2xl font-display font-bold">{title}</h3>
+        <ChevronRight className="w-5 h-5" /> 
+      </div>
 
       <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-3 -mx-2 px-4 snap-x snap-mandatory [scrollbar-width:thin]">
         {posts.map((post, index) => {
@@ -122,7 +128,7 @@ function SocialRow({
             >
               <div
                 className="bg-background rounded-lg overflow-hidden"
-                style={{ height: embedHeight }}
+                style={platform === 'youtube' ? { position: 'relative', paddingBottom: '56.25%', height: 0 } : { height: embedHeight }}
               >
                 {platform === "instagram" ? (
                   <iframe
@@ -134,6 +140,15 @@ function SocialRow({
                     title={`Embedded Instagram post: ${post.id}`}
                     className="w-full border-none"
                   />
+                ) : platform === 'youtube' ? (
+                    <iframe 
+                        src={`https://www.youtube.com/embed/${getYouTubeID(post.post_url)}`}
+                        frameBorder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title={`Embedded YouTube video: ${post.id}`}
+                        className="absolute top-0 left-0 w-full h-full"
+                    ></iframe>
                 ) : (
                   <iframe
                     src={`https://www.linkedin.com/embed/feed/update/${extractLinkedInID(post.post_url)}?collapsed=1`}
@@ -163,4 +178,9 @@ function getInstagramEmbedUrl(url: string): string {
     }
   } catch { }
   return url.includes('/embed') ? url : `${url.split('?')[0]}embed`;
+}
+
+function getYouTubeID(url: string): string {
+    const arr = url.split(/(vi\/|v%3D|v= |\/v\/|youtu\.be\/|\/embed\/)/);
+    return undefined !== arr[2] ? arr[2].split(/[^0-9a-z_\-]/i)[0] : arr[0];
 }

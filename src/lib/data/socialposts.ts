@@ -8,7 +8,7 @@ const db = adminDb;
 export interface SocialPost {
   id: string;
   post_url: string;
-  platform: "instagram" | "linkedin";
+  platform: "instagram" | "linkedin" | "youtube";
   created_at: string;
   priority: number;
 }
@@ -25,10 +25,15 @@ async function getSocialPostsFromDB(): Promise<SocialPost[]> {
   const instagramQuery = socialPostsCollection
     .where("platform", "==", "instagram")
     .orderBy("priority");
+    
+  const youtubeQuery = socialPostsCollection
+    .where("platform", "==", "youtube")
+    .orderBy("priority");
 
-  const [linkedinSnapshot, instagramSnapshot] = await Promise.all([
+  const [linkedinSnapshot, instagramSnapshot, youtubeSnapshot] = await Promise.all([
     linkedinQuery.get(),
     instagramQuery.get(),
+    youtubeQuery.get(),
   ]);
 
   const linkedinPosts = linkedinSnapshot.docs.map(
@@ -37,8 +42,11 @@ async function getSocialPostsFromDB(): Promise<SocialPost[]> {
   const instagramPosts = instagramSnapshot.docs.map(
     (doc) => ({ id: doc.id, ...doc.data() } as SocialPost)
   );
+  const youtubePosts = youtubeSnapshot.docs.map(
+    (doc) => ({ id: doc.id, ...doc.data() } as SocialPost)
+  );
 
-  return [...linkedinPosts, ...instagramPosts];
+  return [...linkedinPosts, ...instagramPosts, ...youtubePosts];
 }
 
 // Cached function that wraps the DB call and applies tags

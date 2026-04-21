@@ -17,10 +17,10 @@ function ReorderablePostList({
     onDelete, 
     onUpdateOrder 
 }: {
-    platform: 'linkedin' | 'instagram';
+    platform: 'linkedin' | 'instagram' | 'youtube';
     posts: SocialPost[];
     onDelete: (id: string) => void;
-    onUpdateOrder: (platform: 'linkedin' | 'instagram', ids: string[]) => void;
+    onUpdateOrder: (platform: 'linkedin' | 'instagram' | 'youtube', ids: string[]) => void;
 }) {
     const [localPosts, setLocalPosts] = useState(posts);
     const [isSaving, setIsSaving] = useState(false);
@@ -110,7 +110,7 @@ export function SocialPostManagement() {
     const updateOrderMutation = useUpdateSocialPostOrder();
 
     const [postUrl, setPostUrl] = useState('');
-    const [platform, setPlatform] = useState<'instagram' | 'linkedin'>('instagram');
+    const [platform, setPlatform] = useState<'instagram' | 'linkedin' | 'youtube'>('instagram');
 
     const handleAddPost = async () => {
         if (!postUrl.trim()) {
@@ -137,7 +137,7 @@ export function SocialPostManagement() {
         }
     };
 
-    const handleUpdateOrder = async (platform: 'linkedin' | 'instagram', postIds: string[]) => {
+    const handleUpdateOrder = async (platform: 'linkedin' | 'instagram' | 'youtube', postIds: string[]) => {
         try {
             await updateOrderMutation.mutateAsync({ platform, postIds });
             toast({ title: 'Success', description: `${platform.charAt(0).toUpperCase() + platform.slice(1)} order updated!` });
@@ -158,7 +158,7 @@ export function SocialPostManagement() {
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
                         <label className="text-sm font-medium">Platform</label>
-                        <Select value={platform} onValueChange={(v) => setPlatform(v as any)}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="instagram">Instagram</SelectItem><SelectItem value="linkedin">LinkedIn</SelectItem></SelectContent></Select>
+                        <Select value={platform} onValueChange={(v) => setPlatform(v as any)}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="instagram">Instagram</SelectItem><SelectItem value="linkedin">LinkedIn</SelectItem><SelectItem value="youtube">YouTube</SelectItem></SelectContent></Select>
                     </div>
                     <div className="space-y-2">
                         <label className="text-sm font-medium">Post URL</label>
@@ -185,6 +185,12 @@ export function SocialPostManagement() {
                     <ReorderablePostList 
                         platform="instagram"
                         posts={data?.instagram || []}
+                        onDelete={handleDeletePost}
+                        onUpdateOrder={handleUpdateOrder}
+                    />
+                     <ReorderablePostList 
+                        platform="youtube"
+                        posts={data?.youtube || []}
                         onDelete={handleDeletePost}
                         onUpdateOrder={handleUpdateOrder}
                     />

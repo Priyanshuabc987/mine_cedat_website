@@ -24,7 +24,7 @@ import { revalidateSocialPosts } from "@/lib/actions/revalidate";
 export interface SocialPost {
   id: string;
   post_url: string;
-  platform: "instagram" | "linkedin";
+  platform: "instagram" | "linkedin" | "youtube";
   created_at: string;
   priority: number;
 }
@@ -32,6 +32,7 @@ export interface SocialPost {
 export interface SocialPostsByPlatform {
   linkedin: SocialPost[];
   instagram: SocialPost[];
+  youtube: SocialPost[];
 }
 
 // --- DATA FETCHING HOOK (for Admin Panel) ---
@@ -52,10 +53,16 @@ export function useSocialPosts() {
         where("platform", "==", "instagram"),
         orderBy("priority")
       );
+      const youtubeQuery = query(
+        socialPostsCollection,
+        where("platform", "==", "youtube"),
+        orderBy("priority")
+      );
 
-      const [linkedinSnapshot, instagramSnapshot] = await Promise.all([
+      const [linkedinSnapshot, instagramSnapshot, youtubeSnapshot] = await Promise.all([
         getDocs(linkedinQuery),
         getDocs(instagramQuery),
+        getDocs(youtubeQuery),
       ]);
 
       const linkedinPosts = linkedinSnapshot.docs.map(
@@ -64,8 +71,11 @@ export function useSocialPosts() {
       const instagramPosts = instagramSnapshot.docs.map(
         (doc) => ({ id: doc.id, ...doc.data() } as SocialPost)
       );
+      const youtubePosts = youtubeSnapshot.docs.map(
+        (doc) => ({ id: doc.id, ...doc.data() } as SocialPost)
+      );
 
-      return { linkedin: linkedinPosts, instagram: instagramPosts };
+      return { linkedin: linkedinPosts, instagram: instagramPosts, youtube: youtubePosts };
     },
   });
 }
@@ -77,7 +87,7 @@ export function useAddSocialPost() {
   const db = useFirestore(); // 3. USE THE HOOK
 
   return useMutation({
-    mutationFn: async (newPost: { post_url: string; platform: "instagram" | "linkedin"; }) => {
+    mutationFn: async (newPost: { post_url: string; platform: "instagram" | "linkedin" | "youtube"; }) => {
       const socialPostsCollection = collection(db, "social_posts");
       const platformQuery = query(socialPostsCollection, where("platform", "==", newPost.platform));
       const snapshot = await getDocs(platformQuery);
@@ -132,7 +142,7 @@ export function useUpdateSocialPostOrder() {
   const db = useFirestore(); // 3. USE THE HOOK
 
   return useMutation({
-    mutationFn: async (variables: { postIds: string[]; platform: "instagram" | "linkedin"; }) => {
+    mutationFn: async (variables: { postIds: string[]; platform: "instagram" | "linkedin" | "youtube"; }) => {
       const batch = writeBatch(db);
       variables.postIds.forEach((id, index) => {
         const docRef = doc(db, "social_posts", id);
@@ -145,9 +155,9 @@ export function useUpdateSocialPostOrder() {
       await queryClient.invalidateQueries({ queryKey: ["social-posts"] });
       
       queryClient.setQueryData<SocialPostsByPlatform>(['social-posts'], (oldData) => {
-          if (!oldData) return { linkedin: [], instagram: [] };
+          if (!oldData) return { linkedin: [], instagram: [], youtube: [] };
           const reorderedPosts = variables.postIds.map(id => 
-              [...oldData.linkedin, ...oldData.instagram].find(p => p.id === id)
+              [...oldData.linkedin, ...oldData.instagram, ...oldData.youtube].find(p => p.id === id)
           ).filter((p): p is SocialPost => !!p);
           
           return {

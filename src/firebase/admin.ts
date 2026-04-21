@@ -18,7 +18,6 @@ if (!admin.apps.length) {
     credential: admin.credential.cert(serviceAccount),
   });
 
-  console.log('Firebase Admin SDK initialized successfully.');
 }
 
 // Export the initialized admin instance, specifically the Firestore database service.
